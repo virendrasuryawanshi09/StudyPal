@@ -1,10 +1,17 @@
 import React from "react"
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
-
-const LoginPage = () => <div>Login Page</div>
-const RegisterPage = () => <div>Register Page</div>
-const Dashboard = () => <div>Dashboard</div>
-const NotFoundPage = () => <div>404 Page Not Found</div>
+import LoginPage from "./pages/Auth/LoginPage";
+import RegisterPage from "./pages/Auth/RegisterPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import DashboardPage from "./pages/Dashboard/DashboardPage.jsx";
+import DocumentListPage from "./pages/documents/DocumentListPage";
+import DocumentDetailPage from "./pages/Documents/DocumentDetailPage";
+import FlashcardListPage from "./pages/Flashcards/FlashcardsListPage";
+import FlashcardPage from "./pages/Flashcards/FlashcardPage";
+import QuizTakePage from "./pages/Quizzes/QuizTakePage";
+import QuizResultPage from "./pages/Quizzes/QuizResultPage";
+import ProfilePage from "./pages/Profile/ProfilePage";
 
 const App = () => {
   const isAuthenticated = true // later replace with auth logic
@@ -38,11 +45,11 @@ const App = () => {
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/documents" element={<DocumentListPage />} />
           <Route path="/documents/:id" element={<DocumentDetailPage />} />
           <Route path="/flashcards" element={<FlashcardListPage />} />
-          <Route path="/documents/:id/flashcards" element={<FlashcardDetailPage />} />
+          <Route path="/documents/:id/flashcards" element={<FlashcardPage />} />
           <Route path="/quizzes/:quizId" element={<QuizTakePage />} />
           <Route path="/quizzes/:quizId/results" element={<QuizResultPage />} />
           <Route path="/profile" element={<ProfilePage />} />
