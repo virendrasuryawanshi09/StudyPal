@@ -5,11 +5,12 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import connectDB from './config/db.js';
 import errorHandler from './middleware/errorHandler.js';
-import { connect } from 'http2';
-import { error } from 'console';
 
-const__filename = fileURLToPath(import.meta.url);
+import authRoutes from './routes/authRoutes.js';
+
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
@@ -34,6 +35,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 //routes
+app.use('/api/auth', authRoutes)
 app.use(errorHandler);
 
 app.use((req, res) => {
