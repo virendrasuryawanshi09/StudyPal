@@ -1,34 +1,64 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-//Generate JWT Token
+// Generate JWT Token
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: '7d',
     });
-}
+};
 
-//register 
-export const register = async (req, res, next) => {
+// Register user
+export const register = async (req, res) => {
     try {
         const { username, email, password } = req.body;
-        const userExists = await User.findOne({ email });
+
+        // Check if email or username exists
+        const userExists = await User.findOne({
+            $or: [{ email }, { username }],
+        });
+
         if (userExists) {
-            const error = new Error('Email already in use');
-            error.statusCode = 400;
-            return next(error);
+            return res.status(400).json({
+                success: false,
+                message:
+                    userExists.email === email
+                        ? 'Email already registered'
+                        : 'Username already taken',
+            });
         }
-        const user = await User.create({ username, email, password });
+
+        // Create user
+        const user = await User.create({
+            username,
+            email,
+            password,
+        });
+
+        // Generate token
+        const token = generateToken(user._id);
+
+        // Send response
         res.status(201).json({
             success: true,
+            message: 'User registered successfully',
             data: {
-                _id: user._id,
-                username: user.username,
-                email: user.email,
-                token: generateToken(user._id),
+                user: {
+                    id: user._id,
+                    username: user.username,
+                    email: user.email,
+                    profileImage: user.profileImage,
+                    createdAt: user.createdAt,
+                },
+                token,
             },
         });
+
     } catch (error) {
-        next(error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message,
+        });
     }
 };
