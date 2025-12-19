@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { use } from 'react';
+
 
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
-        requires: [true, 'Please add a username'],
+        required: [true, 'Please add a username'],
         unique: true,
         trim: true,
         minlength: [3,'Username must be at least 3 characters long'],
@@ -38,11 +38,11 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
-        next();
+        return;
     }
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    next();
+    return;
 });
 
 // Match User Entered Password to Hashed Password in Database

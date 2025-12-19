@@ -36,13 +36,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 //routes
 app.use('/api/auth', authRoutes)
-app.use(errorHandler);
+
 
 app.use((req, res) => {
     res.status(404).json({ message: 'Route not found', status: 404 });
 
 })
-
+app.use(errorHandler);
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`Server is running in ${process.env.NODE_ENV} node on port ${PORT}`);
