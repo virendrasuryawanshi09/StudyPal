@@ -16,19 +16,41 @@ export const protect = async (req, res, next) => {
       req.user = await User.findById(decoded.id).select('-password');
 
       if (!req.user) {
-        const err = new Error('Not authorized, user not found');
-        err.statusCode = 401;
-        return next(err);
+        return res.status(401).json({
+          success: false,
+          message: 'User not found',
+          statusCode: 401,
+        });
       }
 
       return next();
     } catch (error) {
       error.statusCode = 401;
-      return next(error);
+      console.error('Auth Middleware Error:', error.message);
+
+      if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          success: false,
+          message: 'Token has expired',
+          statusCode: 401,
+        });
+      }
+      return res.status(401).json({
+        success: false,
+        message: 'Not authorized, token failed',
+        statusCode: 401,
+      });
+
     }
   }
 
-  const err = new Error('Not authorized, no token');
-  err.statusCode = 401;
-  return next(err);
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized, no token',
+      statusCode: 401,
+    });
+  }
 };
+
+export default protect;

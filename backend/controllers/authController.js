@@ -56,23 +56,32 @@ export const register = async (req, res, next) => {
 
 export const changePassword = async (req, res) => {
     try {
-        const userId = req.user.id;
-        const { currentPassword, newPassword } = req.body;
-        const user = await User.findById(userId).select('+password');
+       const { currentPassword, newPassword } = req.body;
 
-        // Check if current password matches
-        if (!(await user.matchPassword(currentPassword))) {
+       if(!currentPassword || !newPassword){
+        return res.status(400).json({
+            success: false,
+            message: 'Please provide current and new password',
+        });
+       }
+
+       const user = await User.findById(req.user.id).select('+password');
+         const isMatch = await user.matchPassword(currentPassword);
+        if (!isMatch) {
             return res.status(400).json({
                 success: false,
                 message: 'Current password is incorrect',
             });
         }
-        // Update to new password
+
+        //Update to new password
         user.password = newPassword;
         await user.save();
+
         res.status(200).json({
             success: true,
-            message: 'Password changed successfully',
+            message: "Password changed successfully...!!",
+
         });
     } catch (error) {
         res.status(500).json({
@@ -90,7 +99,14 @@ export const getProfile = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            data: user,
+            data: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                profileImage: user.profileImage,
+                createdAt: user.createdAt,
+                updateProfiledAt: user.updatedAt,
+            },
         });
     } catch (error) {
         res.status(500).json({
@@ -104,6 +120,13 @@ export const getProfile = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        if(!email || !password){
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide email and password',
+            });
+        }
 
         //Check email
         const user = await User.findOne({ email }).select('+password');
@@ -150,6 +173,7 @@ export const updateProfile = async (req, res) => {
     try {
         const userId = req.user.id;
         const { username, email, profileImage } = req.body;
+
         const user = await User.findById(userId);
 
         // Check if username or email is taken by another user
@@ -181,14 +205,15 @@ export const updateProfile = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Profile updated successfully',
             data: {
                 id: user._id,
                 username: user.username,
                 email: user.email,
                 profileImage: user.profileImage,
                 createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
             },
+             message: 'Profile updated successfully',
         });
     } catch (error) {
         res.status(500).json({
@@ -198,3 +223,4 @@ export const updateProfile = async (req, res) => {
         });
     }
 };
+
