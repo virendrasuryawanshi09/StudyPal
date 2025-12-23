@@ -8,19 +8,78 @@ import mongoose from 'mongoose';
 
 export const uploadDocument = async (req, res, next) => {
     try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                error: "Please upload a PDF file",
+                statusCode: 400
+            });
+        }
 
+        const {title} = req.body;
+
+        if(!title) {
+            await fs.uplink(req.file.path);
+            return res.status(400).json({
+                success: false,
+                error: 'Please provide a docment title',
+                statusCode: 400
+            });
+        }
+
+        const baseUrl = `http://localhost:${process.env.PORT || 8000}`;
+        const fileUrl = `${baseUrl}/uploads/documents/${req.file.filename}`;
+
+        const document = await Document.create ({
+            userId: req.user._id,
+            title,
+            fileName: req.file.originalname,
+            filePath: fileUrl,
+            fileSize: req.file.size,
+            status: 'processing'
+        });
+
+        processPDF(document._id, req.file.path).catch(err => {
+            console.error('PDF processing error', err);
+        });
+
+            res.status(201).json({
+                success: true,
+                data: document,
+                message: 'Document uploaded successfully. Processing in progress...'
+            })
     } catch (error) {
         if (req.file) {
-            await fs.unlink(req.file.path).catch(() => ());
+            await fs.unlink(req.file.path).catch(() => {});
         }
         next(error);
     }
 
+    //Helper fun to process PDF
+    const processPDF = async (documentId, filePath) => {
+        try {
+            const {text} = await extractTextFromPDF (filePath);
+
+            const chunks = chunkText(text, 500, 50);
+            await Document.findByIdAndUpdate(documentId, {
+                extractedText: text,
+                chunks: chunks,
+                status:'ready'
+            });
+            console.log(`Document ${documentId} processed successfully.`);
+        } catch (err) {
+            console.error('PDF processing error', err);
+
+            await Document.findByIdAndUpdate(documentId, {
+                status: 'failed'
+            });
+
+        }
+    };
+
 };
-
-
 export const getDocuments = async (req, res, next) => {
-
+    
 };
 
 export const getDocument = async (req, res, next) => {
