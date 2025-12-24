@@ -1,10 +1,11 @@
 import Document from '../models/Document.js';
 import Flashcard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
-import { extractTextFromPDF, extractTextFromWord } from '../utils/textExtractor.js';
+import { extractTextFromPDF } from '../utils/pdfParser.js';
 import { chunkText } from '../utils/textChunker.js';
 import fs from 'fs';
 import mongoose from 'mongoose';
+import { count } from 'console';
 
 export const uploadDocument = async (req, res, next) => {
     try {
@@ -16,9 +17,9 @@ export const uploadDocument = async (req, res, next) => {
             });
         }
 
-        const {title} = req.body;
+        const { title } = req.body;
 
-        if(!title) {
+        if (!title) {
             await fs.uplink(req.file.path);
             return res.status(400).json({
                 success: false,
@@ -30,7 +31,7 @@ export const uploadDocument = async (req, res, next) => {
         const baseUrl = `http://localhost:${process.env.PORT || 8000}`;
         const fileUrl = `${baseUrl}/uploads/documents/${req.file.filename}`;
 
-        const document = await Document.create ({
+        const document = await Document.create({
             userId: req.user._id,
             title,
             fileName: req.file.originalname,
@@ -43,14 +44,14 @@ export const uploadDocument = async (req, res, next) => {
             console.error('PDF processing error', err);
         });
 
-            res.status(201).json({
-                success: true,
-                data: document,
-                message: 'Document uploaded successfully. Processing in progress...'
-            })
+        res.status(201).json({
+            success: true,
+            data: document,
+            message: 'Document uploaded successfully. Processing in progress...'
+        })
     } catch (error) {
         if (req.file) {
-            await fs.unlink(req.file.path).catch(() => {});
+            await fs.unlink(req.file.path).catch(() => { });
         }
         next(error);
     }
@@ -58,13 +59,13 @@ export const uploadDocument = async (req, res, next) => {
     //Helper fun to process PDF
     const processPDF = async (documentId, filePath) => {
         try {
-            const {text} = await extractTextFromPDF (filePath);
+            const { text } = await extractTextFromPDF(filePath);
 
             const chunks = chunkText(text, 500, 50);
             await Document.findByIdAndUpdate(documentId, {
                 extractedText: text,
                 chunks: chunks,
-                status:'ready'
+                status: 'ready'
             });
             console.log(`Document ${documentId} processed successfully.`);
         } catch (err) {
@@ -79,18 +80,64 @@ export const uploadDocument = async (req, res, next) => {
 
 };
 export const getDocuments = async (req, res, next) => {
-    
-};
+    try {
+        const documents = await Document.aggregate([
+            { $match: { userId: new mongoose.Types.ObjectId(req.user._id) } },
+            {
+                $lookup: {
+                    from: 'flashcards',
+                    localField: '_id',
+                    foreignField: 'documentId',
+                    as: 'flashcards'
 
+                }
+            },
+            {
+                $lookup: {
+                    from: 'quizzes',
+                    localField: '_id',
+                    foreignField: 'documentId',
+                    as: 'quizzes'
+                }
+            },
+            {
+                $addFields: {
+                    flashcardCount: { $size: '$flashcards' },
+                    quizCount: { $size: '$quizzes' }
+                }
+            },
+            {
+                $project: {
+                    extractedText: 0,
+                    chunks: 0,
+                    flashcardSets: 0,
+                    quizzes: 0
+                }
+            },
+            {
+                $sort: { createdAt: -1 }
+            }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            count: documents.length,
+            data: documents
+        });
+    } catch (error) {
+        next(error);
+    }
+
+};
 export const getDocument = async (req, res, next) => {
 
-};
+    };
 
-export const deleteDocument = async (req, res, next) => {
+    export const deleteDocument = async (req, res, next) => {
 
-};
+    };
 
 
-export const updateDocument = async (req, res, next) => {
+    export const updateDocument = async (req, res, next) => {
 
-};
+    };

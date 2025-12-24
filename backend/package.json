@@ -22,6 +22,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.1",
     "multer": "^2.0.2",
+    "pdf-parse": "^2.4.5",
     "pdf-parser": "^1.0.5"
   },
   "devDependencies": {
