@@ -4,7 +4,6 @@ import {
    getDocuments,
    deleteDocument,
    getDocument,
-    updateDocument,
 } from '../controllers/documentController.js';
 import { protect } from '../middleware/auth.js';    
 import upload from '../config/multer.js';
@@ -18,7 +17,6 @@ router.post('/upload', upload.single('document'), uploadDocument);
 router.get('/', getDocuments);
 router.get('/:id', getDocument);
 router.delete('/:id', deleteDocument);
-router.put('/:id', updateDocument);
 
 
 export default router;

@@ -1,5 +1,9 @@
 import mongoose from 'mongoose';
 
+const arrayLimit = (val) => {
+    return Array.isArray(val) && val.length >= 2;
+};
+
 const quizSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,

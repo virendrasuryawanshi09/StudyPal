@@ -33,8 +33,8 @@ export const chunkText = (text, chunkSize = 500, overlap = 50) => {
                 currentWordCount = 0;
             }
 
-            for (let i = 0; i < paragraphWords.length; i += chunkSize - overlap) {
-                const chunkWords = paragraphWords.slice(i, i + chunkSize);
+            for (let i = 0; i < paragraphWords.length; i += chunkSize - overlap) {  // If para is larger than allowed chunk size - 1 finish current chunk 2 split para by words  3 add overlapping chunks using chunkSize - overlap
+                const chunkWords = paragraphWords.slice(i, i + chunkSize);  // Save current chunk then take last overlap words after that start the next chunk with overlap text and new paragraph
                 chunks.push({
                     content: chunkWords.join(' '),
                     chunkIndex: chunkIndex++,
@@ -99,7 +99,7 @@ export const findRelevantChunks = (chunks, query, maxChunks = 3) => {
     if (!chunks || chunks.length === 0 || !query) {
         return [];
     }
-
+    // Words like: “the” “and” “is” These are ignored because they don’t add meaning.
     const stopWords = new Set([
         'the', 'is', 'at', 'which', 'on', 'a', 'an', 'and', 'it', 'or', 'but',
         'in', 'with', 'for', 'of', 'as', 'by', 'this', 'that', 'it', 'to',
@@ -109,7 +109,7 @@ export const findRelevantChunks = (chunks, query, maxChunks = 3) => {
     const queryWords = query
         .toLowerCase()
         .split(/\s+/)
-        .filter(w => w.length > 2 && !stopWords.has(w));
+        .filter(w => w.length > 2 && !stopWords.has(w));   // Lowercases the query Splits into words Removes stop words Removes very short words
 
     if (queryWords.length === 0) {
         return chunks.slice(0, maxChunks).map(chunk => ({

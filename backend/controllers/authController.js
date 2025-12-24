@@ -49,7 +49,7 @@ export const register = async (req, res, next) => {
             },
         });
     } catch (error) {
-        next(error); // THIS IS THE KEY FIX
+        next(error); 
     }
 };
 
