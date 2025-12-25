@@ -190,8 +190,3 @@ export const deleteDocument = async (req, res, next) => {
         next(error);
     }
 };
-
-
-export const updateDocument = async (req, res, next) => {
-
-};
