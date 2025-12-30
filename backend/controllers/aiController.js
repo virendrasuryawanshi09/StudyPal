@@ -31,7 +31,7 @@ export const generateFlashcards = async (req, res, next) => {
             })
         }
 
-        const cards = await geminiService.generatedFlashcards(
+        const cards = await geminiService.generateFlashcards(
             document.extractedText,
             parseInt(count)
         );
@@ -89,7 +89,6 @@ export const generateQuiz = async (req, res, next) => {
             parseInt(numQuestions)
         );
 
-        // Save to database
         const quiz = await Quiz.create({
             userId: req.user._id,
             documentId: document._id,
@@ -181,7 +180,6 @@ export const chat = async (req, res, next) => {
         const relevantChunks = findRelevantChunks(document.chunks, question, 3);
         const chunkIndices = relevantChunks.map(c => c.chunkIndex);
 
-
         let chatHistory = await ChatHistory.findOne({
             userId: req.user._id,
             documentId: document._id
@@ -198,7 +196,6 @@ export const chat = async (req, res, next) => {
         const answer = await geminiService.chatWithContext(question, relevantChunks);
 
         chatHistory.message.push(
-
             {
                 role: 'user',
                 content: question,
@@ -225,9 +222,6 @@ export const chat = async (req, res, next) => {
             },
             message: 'Response generated successfully'
         });
-
-
-
     } catch (error) {
         next(error);
     }
@@ -262,23 +256,21 @@ export const explainConcept = async (req, res, next) => {
         const relevantChunks = findRelevantChunks(document.chunks, concept, 3);
         const context = relevantChunks.map(c => c.content).join('\n\n');
 
-
-        const explaination = await geminiService.explainConcept(concept, context);
+        const explanation = await geminiService.explainConcept(concept, context);
 
         res.status(200).json({
             success: true,
             data: {
                 concept,
-                explaination,
+                explanation,
                 relevantChunks: relevantChunks.map(c => c.chunkIndex)
             },
-            message: 'Explaination generated successfully'
+            message: 'Explanation generated successfully'
         });
     } catch (error) {
         next(error);
     }
 };
-
 
 export const getChatHistory = async (req, res, next) => {
     try {
@@ -308,7 +300,7 @@ export const getChatHistory = async (req, res, next) => {
         res.status(200).json({
             success: true,
             data: chatHistory.message,
-            message: 'Chat history retrived successfully'
+            message: 'Chat history retrieved successfully'
         });
     } catch (error) {
         next(error);
