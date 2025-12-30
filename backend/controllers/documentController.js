@@ -5,9 +5,30 @@ import { extractTextFromPDF } from '../utils/pdfParser.js';
 import { chunkText } from '../utils/textChunker.js';
 import fs from 'fs';
 import mongoose from 'mongoose';
-import { count } from 'console';
 
 export const uploadDocument = async (req, res, next) => {
+
+    // Helper function to process PDF
+    const processPDF = async (documentId, filePath) => {
+        try {
+            const { text } = await extractTextFromPDF(filePath);
+
+            const chunks = chunkText(text, 500, 50);
+            await Document.findByIdAndUpdate(documentId, {
+                extractedText: text,
+                chunks: chunks,
+                status: 'ready'
+            });
+            console.log(`Document ${documentId} processed successfully.`);
+        } catch (err) {
+            console.error('PDF processing error', err);
+
+            await Document.findByIdAndUpdate(documentId, {
+                status: 'failed'
+            });
+        }
+    };
+
     try {
         if (!req.file) {
             return res.status(400).json({
@@ -20,10 +41,10 @@ export const uploadDocument = async (req, res, next) => {
         const { title } = req.body;
 
         if (!title) {
-            await fs.uplink(req.file.path);
+            await fs.unlink(req.file.path);
             return res.status(400).json({
                 success: false,
-                error: 'Please provide a docment title',
+                error: 'Please provide a document title',
                 statusCode: 400
             });
         }
@@ -48,36 +69,13 @@ export const uploadDocument = async (req, res, next) => {
             success: true,
             data: document,
             message: 'Document uploaded successfully. Processing in progress...'
-        })
+        });
     } catch (error) {
         if (req.file) {
             await fs.unlink(req.file.path).catch(() => { });
         }
         next(error);
     }
-
-    //Helper fun to process PDF
-    const processPDF = async (documentId, filePath) => {
-        try {
-            const { text } = await extractTextFromPDF(filePath);
-
-            const chunks = chunkText(text, 500, 50);
-            await Document.findByIdAndUpdate(documentId, {
-                extractedText: text,
-                chunks: chunks,
-                status: 'ready'
-            });
-            console.log(`Document ${documentId} processed successfully.`);
-        } catch (err) {
-            console.error('PDF processing error', err);
-
-            await Document.findByIdAndUpdate(documentId, {
-                status: 'failed'
-            });
-
-        }
-    };
-
 };
 
 export const getDocuments = async (req, res, next) => {
@@ -90,7 +88,6 @@ export const getDocuments = async (req, res, next) => {
                     localField: '_id',
                     foreignField: 'documentId',
                     as: 'flashcards'
-
                 }
             },
             {
@@ -128,8 +125,8 @@ export const getDocuments = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-
 };
+
 export const getDocument = async (req, res, next) => {
     try {
         const document = await Document.findOne({
@@ -137,7 +134,7 @@ export const getDocument = async (req, res, next) => {
             userId: req.user._id
         });
 
-        if(!document) {
+        if (!document) {
             return res.status(404).json({
                 success: false,
                 error: 'Document not found',
@@ -145,8 +142,15 @@ export const getDocument = async (req, res, next) => {
             });
         }
 
-        const flashcardCount = await Flashcard.countDocuments({documentId: document._id, userId: req.user._id });
-        const quizCount = await QuizcountDocuments({documentId: document._id, userId: req.user._id});
+        const flashcardCount = await Flashcard.countDocuments({
+            documentId: document._id,
+            userId: req.user._id
+        });
+
+        const quizCount = await Quiz.countDocuments({
+            documentId: document._id,
+            userId: req.user._id
+        });
 
         document.lastAccessed = Date.now();
         await document.save();
@@ -159,34 +163,34 @@ export const getDocument = async (req, res, next) => {
             success: true,
             data: documentData
         });
-    }catch(error) {
+    } catch (error) {
         next(error);
     }
 };
 
 export const deleteDocument = async (req, res, next) => {
-    try{
+    try {
         const document = await Document.findOne({
             _id: req.params.id,
             userId: req.user._id
         });
 
-        if(!document) {
+        if (!document) {
             return res.status(404).json({
                 success: false,
                 error: 'Document not found...'
-            })
+            });
         }
 
-        await fs.unlink(document.filePath).catch(()=>{});
+        await fs.unlink(document.filePath).catch(() => {});
 
         await document.deleteOne();
 
-        res.status(200).json ({
+        res.status(200).json({
             success: true,
             message: 'Document deleted successfully'
         });
-    }catch(error) {
+    } catch (error) {
         next(error);
     }
 };
