@@ -1,9 +1,11 @@
 import React from 'react'
+import { Navigate, Outlet } from 'react-router-dom';
+import AppLayout from "../layout/AppLayout.jsx";
+import {useAuth} from "../../context/AuthContext";
 
 function ProtectedRoute() {
-    const isAuthenticated = true// Replace with actual authentication logic
-    const loading = false // Replace with actual loading state
-
+    const {isAuthenticated, loading} = useAuth();
+    
     if(loading) {
         return <div>Loading...</div>
     }

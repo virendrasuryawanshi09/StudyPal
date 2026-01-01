@@ -5,3 +5,4 @@ export const AppLayout = () => {
     <div>AppLayout</div>
   )
 }
+export default AppLayout;

@@ -12,7 +12,7 @@ import FlashcardPage from "./pages/Flashcards/FlashcardPage";
 import QuizTakePage from "./pages/Quizzes/QuizTakePage";
 import QuizResultPage from "./pages/Quizzes/QuizResultPage";
 import ProfilePage from "./pages/Profile/ProfilePage";
-import useAuth from "./context/AuthContext.js"
+import {useAuth} from "./context/AuthContext"
 
 const App = () => {
   const {isAuthenticated, loading} = useAuth();
