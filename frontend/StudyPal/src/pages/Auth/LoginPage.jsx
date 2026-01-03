@@ -6,8 +6,8 @@ import { BrainCircuit, Mail, Lock, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('alex@timetoprogram.com');
-  const [password, setPassword] = useState('Test@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
@@ -36,19 +36,26 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-[#1e1b33] px-4 transition-colors duration-300">
-      <div className="w-full max-w-md bg-white dark:bg-[#2e2752] rounded-xl shadow-lg p-8 transition-colors duration-300">
+    <div className="min-h-screen flex items-center justify-center px-4
+      bg-slate-100 dark:bg-[#0f1115] transition-colors duration-300"
+    >
+      <div className="w-full max-w-md p-8 rounded-xl
+        bg-white dark:bg-[#181b22]
+        shadow-lg dark:shadow-2xl transition-colors duration-300"
+      >
 
         {/* Header */}
         <div className="text-center mb-8">
           <div className="mx-auto mb-4 w-12 h-12 flex items-center justify-center rounded-full
-            bg-emerald-100 dark:bg-purple-900 transition-colors duration-300">
-            <BrainCircuit className="text-emerald-600 dark:text-purple-400" strokeWidth={2} />
+            bg-slate-200 dark:bg-[#232734] transition-colors"
+          >
+            <BrainCircuit className="text-slate-700 dark:text-slate-300" strokeWidth={2} />
           </div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">
+
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
             Welcome back!
           </h1>
-          <p className="text-slate-500 dark:text-slate-300 mt-1">
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
             Sign in to continue your journey
           </p>
         </div>
@@ -61,11 +68,12 @@ const LoginPage = () => {
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               Email
             </label>
+
             <div className="relative">
               <div
-                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${
+                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${
                   focusedField === 'email'
-                    ? 'text-emerald-500 dark:text-purple-400'
+                    ? 'text-slate-700 dark:text-indigo-400'
                     : 'text-slate-400 dark:text-slate-500'
                 }`}
               >
@@ -79,11 +87,14 @@ const LoginPage = () => {
                 onFocus={() => setFocusedField('email')}
                 onBlur={() => setFocusedField(null)}
                 placeholder="youremail@example.com"
-                className="w-full pl-11 pr-4 py-2 border rounded-lg
+                className="w-full pl-11 pr-4 py-2.5 rounded-lg
+                  bg-white dark:bg-[#1f2430]
+                  border border-slate-300 dark:border-slate-600
+                  text-slate-900 dark:text-slate-100
+                  placeholder:text-slate-400
                   focus:outline-none focus:ring-2
-                  focus:ring-emerald-500 dark:focus:ring-purple-500
-                  dark:bg-[#3a315d] dark:border-[#4d4880] dark:text-white
-                  transition-colors duration-300"
+                  focus:ring-slate-400 dark:focus:ring-indigo-500
+                  transition-colors"
                 required
               />
             </div>
@@ -94,11 +105,12 @@ const LoginPage = () => {
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               Password
             </label>
+
             <div className="relative">
               <div
-                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${
+                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${
                   focusedField === 'password'
-                    ? 'text-emerald-500 dark:text-purple-400'
+                    ? 'text-slate-700 dark:text-indigo-400'
                     : 'text-slate-400 dark:text-slate-500'
                 }`}
               >
@@ -112,58 +124,55 @@ const LoginPage = () => {
                 onFocus={() => setFocusedField('password')}
                 onBlur={() => setFocusedField(null)}
                 placeholder="********"
-                className="w-full pl-11 pr-4 py-2 border rounded-lg
+                className="w-full pl-11 pr-4 py-2.5 rounded-lg
+                  bg-white dark:bg-[#1f2430]
+                  border border-slate-300 dark:border-slate-600
+                  text-slate-900 dark:text-slate-100
+                  placeholder:text-slate-400
                   focus:outline-none focus:ring-2
-                  focus:ring-emerald-500 dark:focus:ring-purple-500
-                  dark:bg-[#3a315d] dark:border-[#4d4880] dark:text-white
-                  transition-colors duration-300"
+                  focus:ring-slate-400 dark:focus:ring-indigo-500
+                  transition-colors"
                 required
               />
             </div>
           </div>
 
-          {/* Error Message */}
           {error && (
             <p className="text-sm text-red-500 text-center">{error}</p>
           )}
 
-          {/* Submit Button */}
+          {/* Button */}
           <button
             type="submit"
             disabled={loading}
-            className="
-              w-full py-3 px-6 rounded-xl
-              font-semibold text-white
-              bg-gradient-to-r from-emerald-600 to-emerald-400
-              dark:from-purple-600 dark:to-purple-400
-              hover:from-emerald-400 hover:to-emerald-600
-              dark:hover:from-purple-400 dark:hover:to-purple-600
-              transition-all duration-300 ease-in-out
-              shadow-md hover:shadow-xl
-              hover:-translate-y-0.5
-              active:translate-y-0
-              disabled:opacity-60 disabled:cursor-not-allowed
+            className="w-full px-6 py-3 rounded-lg font-semibold text-white
+              bg-gradient-to-r from-slate-700 to-slate-600
+              hover:from-slate-600 hover:to-slate-700
+              dark:bg-gradient-to-r dark:from-indigo-600 dark:to-indigo-500
+              dark:hover:from-indigo-500 dark:hover:to-indigo-600
+              transition-all duration-200 ease-out
+              shadow-md hover:shadow-lg
+              hover:-translate-y-[1px] active:translate-y-0
               flex items-center justify-center gap-2
-            "
+              disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
-              'Signing in...'
+              'Signing in…'
             ) : (
               <>
                 Sign In
-                <ArrowRight size={18} />
+                <ArrowRight size={18} className="relative top-[1px]" />
               </>
             )}
           </button>
-
         </form>
 
         {/* Footer */}
-        <p className="text-center text-sm text-slate-500 dark:text-slate-300 mt-6">
+        <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6">
           Don&apos;t have an account?{' '}
           <Link
             to="/register"
-            className="text-emerald-600 dark:text-purple-400 hover:underline transition-colors duration-300"
+            className="text-slate-700 dark:text-indigo-400 hover:underline"
           >
             Sign up
           </Link>
