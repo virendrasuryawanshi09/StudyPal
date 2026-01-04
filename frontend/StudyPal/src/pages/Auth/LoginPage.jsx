@@ -27,7 +27,7 @@ const LoginPage = () => {
       navigate('/dashboard');
     } catch (error) {
       const message =
-        error?.message || 'Failed to login. Please check your credentials.';
+        error?.message || 'We couldn’t verify your credentials. Please try again.';
       setError(message);
       toast.error(message);
     } finally {
@@ -52,10 +52,10 @@ const LoginPage = () => {
             <BrainCircuit className="text-slate-700 dark:text-slate-300" strokeWidth={2} />
           </div>
 
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
             Welcome back!
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
             Sign in to continue your journey
           </p>
         </div>
@@ -87,6 +87,8 @@ const LoginPage = () => {
                 onFocus={() => setFocusedField('email')}
                 onBlur={() => setFocusedField(null)}
                 placeholder="youremail@example.com"
+                required
+                aria-invalid={!!error}
                 className="w-full pl-11 pr-4 py-2.5 rounded-lg
                   bg-white dark:bg-[#1f2430]
                   border border-slate-300 dark:border-slate-600
@@ -94,8 +96,8 @@ const LoginPage = () => {
                   placeholder:text-slate-400
                   focus:outline-none focus:ring-2
                   focus:ring-slate-400 dark:focus:ring-indigo-500
-                  transition-colors"
-                required
+                  focus:ring-offset-1
+                  transition-shadow"
               />
             </div>
           </div>
@@ -124,6 +126,8 @@ const LoginPage = () => {
                 onFocus={() => setFocusedField('password')}
                 onBlur={() => setFocusedField(null)}
                 placeholder="********"
+                required
+                aria-invalid={!!error}
                 className="w-full pl-11 pr-4 py-2.5 rounded-lg
                   bg-white dark:bg-[#1f2430]
                   border border-slate-300 dark:border-slate-600
@@ -131,14 +135,19 @@ const LoginPage = () => {
                   placeholder:text-slate-400
                   focus:outline-none focus:ring-2
                   focus:ring-slate-400 dark:focus:ring-indigo-500
-                  transition-colors"
-                required
+                  focus:ring-offset-1
+                  transition-shadow"
               />
             </div>
           </div>
 
+          {/* Error */}
           {error && (
-            <p className="text-sm text-red-500 text-center">{error}</p>
+            <p className="text-sm text-red-600 bg-red-50 dark:bg-red-900/20
+              border border-red-200 dark:border-red-800
+              rounded-md py-2 px-3 text-center">
+              {error}
+            </p>
           )}
 
           {/* Button */}
@@ -153,11 +162,15 @@ const LoginPage = () => {
               transition-all duration-200 ease-out
               shadow-md hover:shadow-lg
               hover:-translate-y-[1px] active:translate-y-0
+              focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2
               flex items-center justify-center gap-2
               disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
-              'Signing in…'
+              <div className="flex items-center gap-2">
+                <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                Signing in…
+              </div>
             ) : (
               <>
                 Sign In
@@ -172,10 +185,14 @@ const LoginPage = () => {
           Don&apos;t have an account?{' '}
           <Link
             to="/register"
-            className="text-slate-700 dark:text-indigo-400 hover:underline"
+            className="text-slate-700 dark:text-indigo-400 font-medium hover:underline"
           >
             Sign up
           </Link>
+        </p>
+
+        <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-4">
+          By continuing, you agree to our Terms & Privacy Policy
         </p>
       </div>
     </div>
