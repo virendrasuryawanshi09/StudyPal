@@ -86,36 +86,92 @@ const DashboardPage = () => {
   ];
 
   return (
-   <div className="">
     <div className="">
       <div className="">
         <div className="">
-          <h1 className="">
-            Dashboard
-          </h1>
-          <p className="">
-            Track your learning progress and activity
-          </p>
-        </div>
-        <div className="">
-          {stats.map((stat, index) => {
-            <div 
-            key={index}
-            className=""
-            >
-              <div className="">
-                <span className="">
-                  {stat.label}
-                </span>
-                <div className={`w-11 h-11 rounded-xl bg-linear-to-br ${stat.gradient} shadow-lg ${stat.shadowColor} flex items-center justify-center group-hover:3.05`} ></div>
+          <div className="">
+            <h1 className="">
+              Dashboard
+            </h1>
+            <p className="">
+              Track your learning progress and activity
+            </p>
+          </div>
+          <div className="">
+            {stats.map((stat, index) => {
+              <div
+                key={index}
+                className=""
+              >
+                <div className="">
+                  <span className="">
+                    {stat.label}
+                  </span>
+                  <div className={`w-11 h-11 rounded-xl bg-linear-to-br ${stat.gradient} shadow-lg ${stat.shadowColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`} >
+                    <stat.icon className="" strokeWidth={2} />
+                  </div>
+                </div>
+                <div className="">
+                  {stat.value}
+                </div>
               </div>
+            })}
+          </div>
+
+          <div className="">
+            <div className="">
+              <div className="">
+                <Clock className="" strokeWidth={2} />
+              </div>
+              <h3 className="">
+                Recent Activity
+              </h3>
             </div>
-          })}
+
+            {dashboardData.recentActivity && (dashboardData.recentActivity.documents.length > 0 || dashboardData.recentActivity.quizzes.length > 0) ?
+              <div className="">
+                {[
+                  ...(dashboardData.recentActivity.documents || []).map(doc => ({
+                    id: doc._id,
+                    description: doc.title,
+                    timestamp: doc.lastAccessed,
+                    link: `/documents/${doc._id}`,
+                    type: 'document',
+                  })),
+
+                  ...(dashboardData.recentActivity.quizzes || []).map(quiz => ({
+                    id: quiz._id,
+                    description: quiz.title,
+                    timestamp: quiz.lastAccessed,
+                    link: `/quizzes/${quiz._id}`,
+                    type: 'quiz',
+                  })),
+
+                ]
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                .map((activity, index) => {
+                  <div
+                    key={activity.id || index}
+                    className=""
+                    >
+                      <div className="">
+                        <div className="">
+                          <div className={`w-2 h-2 rounded-full ${
+                            activity.type === 'document'
+                            ? 'bg-line'
+                          }`}>
+
+                          </div>
+                        </div>
+                      </div>
+                })
+                }
+                }
+              </div>
+      </div>
         </div>
       </div>
-    </div>
-   </div>
-  );
+      );
 };
 
-export default DashboardPage;
+      export default DashboardPage;
