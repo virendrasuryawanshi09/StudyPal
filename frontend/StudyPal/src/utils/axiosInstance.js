@@ -11,17 +11,20 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(
-    (config) => {
-        const accessToken = localStorage.getItem("token");
-        if(accessToken) {
-            config.headers.Authorization = `Bearer ${accessToken}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
+  (config) => {
+    let accessToken = localStorage.getItem("token");
+    if (accessToken) {
+      // Remove quotes if they exist
+      accessToken = accessToken.replace(/^"|"$/g, "");
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
 );
+
 
 // Response Interceptor
 axiosInstance.interceptors.response.use(

@@ -3,28 +3,33 @@ import { API_PATHS } from "../utils/apiPaths";
 
 const login = async (email, password) => {
   try {
-    const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
-      email,
-      password,
-    });
+    const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, { email, password });
+    return response.data; // expected to be { token, user }
+  } catch (error) {
+    // Handle axios errors properly
+    if (error.response) {
+      // Backend responded with an error status
+      throw error.response.data || { message: "Server returned an error" };
+    } else if (error.request) {
+      // Request made but no response
+      throw { message: "No response from server. Please check your connection." };
+    } else {
+      // Something else
+      throw { message: error.message || "An unknown error occurred" };
+    }
+  }
+};
+
+
+const register = async (username, email, password) => {
+  try {
+    const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, { username, email, password });
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "An unknown error occurred" };
   }
 };
 
-const register = async (username, email, password) => {
-  try {
-    const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
-      username,
-      email,
-      password,
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || { message: "An unknown error occurred" };
-  }
-};
 const getProfile = async () => {
   try {
     const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE);
@@ -36,10 +41,7 @@ const getProfile = async () => {
 
 const updateProfile = async (userData) => {
   try {
-    const response = await axiosInstance.put(
-      API_PATHS.AUTH.UPDATE_PROFILE,
-      userData
-    );
+    const response = await axiosInstance.put(API_PATHS.AUTH.UPDATE_PROFILE, userData);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "An unknown error occurred" };
@@ -48,10 +50,7 @@ const updateProfile = async (userData) => {
 
 const changePassword = async (passwords) => {
   try {
-    const response = await axiosInstance.post(
-      API_PATHS.AUTH.CHANGE_PASSWORD,
-      passwords
-    );
+    const response = await axiosInstance.post(API_PATHS.AUTH.CHANGE_PASSWORD, passwords);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "An unknown error occurred" };
@@ -59,11 +58,11 @@ const changePassword = async (passwords) => {
 };
 
 const authService = {
-    login,
-    register,
-    getProfile,
-    updateProfile,
-    changePassword,
+  login,
+  register,
+  getProfile,
+  updateProfile,
+  changePassword,
 };
 
 export default authService;
