@@ -1,6 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Trash2, Clock } from 'lucide-react';
+import {
+  FileText,
+  Trash2,
+  Clock,
+  BookOpen,
+  BrainCircuit,
+} from 'lucide-react';
 import moment from 'moment';
 
 /* Utility: format file size */
@@ -36,28 +42,32 @@ const DocumentCard = ({ document, onDelete }) => {
       onClick={handleNavigate}
       className="
         group cursor-pointer
-        p-5 rounded-2xl
+        rounded-2xl p-5
         bg-white dark:bg-[#181b22]
         border border-slate-200/60 dark:border-slate-700/60
-        hover:shadow-lg hover:-translate-y-0.5
-        transition-all
+        hover:shadow-xl hover:-translate-y-0.5
+        transition-all duration-200
       "
     >
       {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3 min-w-0">
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
           <div className="
-            w-10 h-10 rounded-xl
+            w-11 h-11 rounded-xl
             bg-slate-100 dark:bg-[#232734]
             flex items-center justify-center
           ">
             <FileText className="w-5 h-5 text-slate-600 dark:text-slate-300" />
           </div>
 
-          <div className="min-w-0">
-            <p className="font-medium text-slate-900 dark:text-slate-100 truncate">
+          <div>
+            <h3
+              className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1"
+              title={document.title}
+            >
               {document.title}
-            </p>
+            </h3>
+
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {formatFileSize(document.fileSize)}
             </p>
@@ -70,14 +80,47 @@ const DocumentCard = ({ document, onDelete }) => {
             text-slate-400 hover:text-red-600
             transition-colors
           "
-          aria-label="Delete document"
         >
           <Trash2 size={18} />
         </button>
       </div>
 
+      {/* Stats Badges */}
+      <div className="flex flex-wrap items-center gap-3 mt-4">
+        {document.flashcardCount !== undefined && (
+          <div
+            className="
+              inline-flex items-center gap-2
+              px-3 py-1 rounded-full text-xs font-medium
+              bg-indigo-50 text-indigo-600
+              dark:bg-indigo-500/15 dark:text-indigo-300
+            "
+          >
+            <BookOpen size={14} />
+            {document.flashcardCount} Flashcards
+          </div>
+        )}
+
+        {document.quizCount !== undefined && (
+          <div
+            className="
+              inline-flex items-center gap-2
+              px-3 py-1 rounded-full text-xs font-medium
+              bg-violet-50 text-violet-600
+              dark:bg-violet-500/15 dark:text-violet-300
+            "
+          >
+            <BrainCircuit size={14} />
+            {document.quizCount} Quizzes
+          </div>
+        )}
+      </div>
+
       {/* Footer */}
-      <div className="flex items-center gap-2 mt-4 text-xs text-slate-500 dark:text-slate-400">
+      <div className="
+        flex items-center gap-1.5 mt-5
+        text-xs text-slate-500 dark:text-slate-400
+      ">
         <Clock size={14} />
         <span>
           Uploaded {moment(document.createdAt).fromNow()}
