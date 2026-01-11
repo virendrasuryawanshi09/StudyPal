@@ -28,9 +28,11 @@ const DocumentSchema = new mongoose.Schema(
     },
     extractedText: {
       type: String,
-      required: [true, 'Please add extracted text for the document'],
-      trim: true,
+      required: function () {
+        return this.status === "ready";
+      }
     },
+
     chunks: [
       {
         content: {

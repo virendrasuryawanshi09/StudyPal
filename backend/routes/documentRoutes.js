@@ -13,7 +13,7 @@ const router = express.Router();
 // Protect all routes
 router.use(protect);
 
-router.post('/upload', upload.single('document'), uploadDocument);
+router.post('/upload', upload.single('file'), uploadDocument);
 router.get('/', getDocuments);
 router.get('/:id', getDocument);
 router.delete('/:id', deleteDocument);
