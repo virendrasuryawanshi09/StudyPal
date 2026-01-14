@@ -1,81 +1,168 @@
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import documentService from '../../services/documentService';
+import Spinner from '../../components/common/spinner';
+import toast from 'react-hot-toast';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 
-import React, { useState, useEffect, use } from 'react'
-import { Plus, Upload, Trash2, FileText, X } from 'lucide-react'
-import toast from 'react-hot-toast'
+const DocumentDetailPage = () => {
+  const { id } = useParams();
 
-import documentService from '../../services/documentService'
-import Spinner from '../../components/common/spinner'
-export const DocumentDetailPage = () => {
-
-  const [documents, setDocuments] = useState([]);
+  const [document, setDocument] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('content');
 
-  //State for upload model
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [uploadFile, setUploadfile] = useState(null);
-  const [uploadTitle, setUploadTitle] = useState("");
-  const [uploading, setUploaduing] = useState(false);
-
-  //For Deleting
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [selectedDoc, setSelectedDoc] = useState(null);
-
-  const fetchDocuments = async () => {
-    try {
-      const data = await documentService.getDocuments();
-      setDocuments(data);
-    } catch (error) {
-      toast.error("Failed to fetch documents.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  /* ================= FETCH DOCUMENT ================= */
 
   useEffect(() => {
-    fetchDocuments();
-  }, []);
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setUploadfile(file);
-      setUploadTitle{
-        file.name.replace(/\.[^/.]+$/, "");
-
+    const fetchDocumentDetails = async () => {
+      try {
+        const data = await documentService.getDocumentById(id);
+        setDocument(data);
+      } catch (error) {
+        toast.error('Failed to fetch document details');
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    const handleUpload = async (e) => {
-      e.preventDefault();
-      if (!uploadFile || !uploadTitle) {
-        toast.error("Please provide a title and select a file.");
-        return;
-      }
-      setUploaduing(true);
-      const formData = new FormData();
-      formData.append("file", uploadFile);
-      formData.append("title", uploadTitle);
+    fetchDocumentDetails();
+  }, [id]);
 
-      try {
-        await documentService.uploadDocument(formData);
-        toast.success("Document uploaded successfully!");
-        setIsUploadModalOpen(false);
-        setUploadFile(null);
-        setUploadTitle("");
-        setLoading(true);
-        fetchDocuments();
-      } catch (error) {
-        toast.error(error.message || "Upload failed.");
-      } finally {
-        setUploading(false);
-      }
+  /* ================= PDF URL HELPER ================= */
 
+  const getPdfUrl = () => {
+    if (!document?.data?.filePath) return null;
+
+    const filePath = document.data.filePath;
+
+    // Absolute URL
+    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+      return filePath;
     }
+
+    // Relative URL
+    const baseUrl =
+      process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
+    return `${baseUrl}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
+  };
+
+  /* ================= TAB RENDERS ================= */
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="flex justify-center py-20">
+          <Spinner />
+        </div>
+      );
+    }
+
+    if (!document?.data?.filePath) {
+      return (
+        <div className="text-sm text-slate-500">
+          PDF not available
+        </div>
+      );
+    }
+
+    const pdfUrl = getPdfUrl();
+
+    return (
+      <div className="space-y-4">
+        {/* Toolbar */}
+        <div className="flex justify-end">
+          <a
+            href={pdfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="
+              inline-flex items-center gap-2
+              text-sm font-medium
+              text-slate-600 hover:text-slate-900
+              dark:text-slate-400 dark:hover:text-slate-200
+              transition
+            "
+          >
+            <ExternalLink size={16} />
+            Open in new tab
+          </a>
+        </div>
+
+        {/* PDF Viewer */}
+        <div
+          className="
+            rounded-xl overflow-hidden
+            border border-slate-200 dark:border-slate-700
+            bg-white dark:bg-[#181b22]
+            h-[75vh]
+          "
+        >
+          <iframe
+            src={pdfUrl}
+            title="PDF Viewer"
+            className="w-full h-full"
+            frameBorder="0"
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const renderChat = () => {
+    return (
+      <div className="text-sm text-slate-500">
+        Chat feature coming soon
+      </div>
+    );
+  };
+
+  const renderAIActions = () => {
+    return (
+      <div className="text-sm text-slate-500">
+        AI actions will appear here
+      </div>
+    );
+  };
+
+  const renderFlashcardsTab = () => {
+    return (
+      <div className="text-sm text-slate-500">
+        Flashcards loading...
+      </div>
+    );
+  };
+
+  const renderQuizzesTab = () => {
+    return (
+      <div className="text-sm text-slate-500">
+        Quizzes loading...
+      </div>
+    );
+  };
+
+  /* ================= TABS CONFIG ================= */
+
+  const tabs = [
+    { key: 'content', label: 'Content', render: renderContent },
+    { key: 'chat', label: 'Chat', render: renderChat },
+    { key: 'ai', label: 'AI Actions', render: renderAIActions },
+    { key: 'flashcards', label: 'Flashcards', render: renderFlashcardsTab },
+    { key: 'quizzes', label: 'Quizzes', render: renderQuizzesTab },
+  ];
+
+
+  if(loading) {
+    return <Spinner />
+  }
+
+  if(!document) {
+    return <div className="">Document not found.</div>
   }
 
   return (
-    <div>DocumentDetailPage</div>
+    <div> DocumentDetailPage</div>
   )
 }
-export default DocumentDetailPage;
