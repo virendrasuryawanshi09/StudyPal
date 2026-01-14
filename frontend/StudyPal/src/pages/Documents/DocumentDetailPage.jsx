@@ -4,6 +4,8 @@ import documentService from '../../services/documentService';
 import Spinner from '../../components/common/spinner';
 import toast from 'react-hot-toast';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
+import PageHeader from '../../components/common/PageHeader';
+import Tabs from '../../components/common/Tabs';
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -154,15 +156,25 @@ const DocumentDetailPage = () => {
   ];
 
 
-  if(loading) {
+  if (loading) {
     return <Spinner />
   }
 
-  if(!document) {
+  if (!document) {
     return <div className="">Document not found.</div>
   }
 
   return (
-    <div> DocumentDetailPage</div>
+    <div>
+      <div className="">
+        <Link to="/documents" className="">
+          <ArrowLeft size={16} />
+          Back to Documents
+        </Link>
+      </div>
+      <PageHeader title={document.data.title} />
+      <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+    </div>
   )
 }
+export default DocumentDetailPage;
