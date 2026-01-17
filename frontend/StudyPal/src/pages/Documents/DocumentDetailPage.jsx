@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import documentService from '../../services/documentService';
 import Spinner from '../../components/common/spinner';
 import toast from 'react-hot-toast';
@@ -19,25 +19,27 @@ const DocumentDetailPage = () => {
   useEffect(() => {
     const fetchDocumentDetails = async () => {
       try {
+        setLoading(true);
         const data = await documentService.getDocumentById(id);
         setDocument(data);
       } catch (error) {
-        toast.error('Failed to fetch document details');
         console.error(error);
+        toast.error('Failed to fetch document details');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDocumentDetails();
+    if (id) {
+      fetchDocumentDetails();
+    }
   }, [id]);
 
   /* ================= PDF URL HELPER ================= */
 
   const getPdfUrl = () => {
-    if (!document?.data?.filePath) return null;
-
-    const filePath = document.data.filePath;
+    const filePath = document?.data?.filePath;
+    if (!filePath) return null;
 
     // Absolute URL
     if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
@@ -62,15 +64,15 @@ const DocumentDetailPage = () => {
       );
     }
 
-    if (!document?.data?.filePath) {
+    const pdfUrl = getPdfUrl();
+
+    if (!pdfUrl) {
       return (
         <div className="text-sm text-slate-500">
           PDF not available
         </div>
       );
     }
-
-    const pdfUrl = getPdfUrl();
 
     return (
       <div className="space-y-4">
@@ -96,10 +98,10 @@ const DocumentDetailPage = () => {
         {/* PDF Viewer */}
         <div
           className="
+            h-[75vh]
             rounded-xl overflow-hidden
             border border-slate-200 dark:border-slate-700
             bg-white dark:bg-[#181b22]
-            h-[75vh]
           "
         >
           <iframe
@@ -113,37 +115,29 @@ const DocumentDetailPage = () => {
     );
   };
 
-  const renderChat = () => {
-    return (
-      <div className="text-sm text-slate-500">
-        Chat feature coming soon
-      </div>
-    );
-  };
+  const renderChat = () => (
+    <div className="text-sm text-slate-500">
+      Chat feature coming soon
+    </div>
+  );
 
-  const renderAIActions = () => {
-    return (
-      <div className="text-sm text-slate-500">
-        AI actions will appear here
-      </div>
-    );
-  };
+  const renderAIActions = () => (
+    <div className="text-sm text-slate-500">
+      AI actions will appear here
+    </div>
+  );
 
-  const renderFlashcardsTab = () => {
-    return (
-      <div className="text-sm text-slate-500">
-        Flashcards loading...
-      </div>
-    );
-  };
+  const renderFlashcardsTab = () => (
+    <div className="text-sm text-slate-500">
+      Flashcards loading...
+    </div>
+  );
 
-  const renderQuizzesTab = () => {
-    return (
-      <div className="text-sm text-slate-500">
-        Quizzes loading...
-      </div>
-    );
-  };
+  const renderQuizzesTab = () => (
+    <div className="text-sm text-slate-500">
+      Quizzes loading...
+    </div>
+  );
 
   /* ================= TABS CONFIG ================= */
 
@@ -155,26 +149,45 @@ const DocumentDetailPage = () => {
     { key: 'quizzes', label: 'Quizzes', render: renderQuizzesTab },
   ];
 
+  /* ================= PAGE STATES ================= */
 
-  if (loading) {
-    return <Spinner />
-  }
-
-  if (!document) {
-    return <div className="">Document not found.</div>
+  if (!loading && !document) {
+    return (
+      <div className="p-6 text-sm text-slate-500">
+        Document not found.
+      </div>
+    );
   }
 
   return (
-    <div>
-      <div className="">
-        <Link to="/documents" className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900 transition-colors">
-          <ArrowLeft size={16} />
-          Back to Documents
-        </Link>
-      </div>
-      <PageHeader title={document.data.title} />
-      <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className="space-y-4">
+      {/* Back Button */}
+      <Link
+        to="/documents"
+        className="
+          inline-flex items-center gap-2
+          text-sm text-neutral-600
+          hover:text-neutral-900
+          transition-colors
+        "
+      >
+        <ArrowLeft size={16} />
+        Back to Documents
+      </Link>
+
+      {/* Page Header */}
+      {document?.data?.title && (
+        <PageHeader title={document.data.title} />
+      )}
+
+      {/* Tabs */}
+      <Tabs
+        tabs={tabs}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
     </div>
-  )
-}
+  );
+};
+
 export default DocumentDetailPage;
