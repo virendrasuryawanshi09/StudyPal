@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
 import Tabs from '../../components/common/Tabs';
+import Chatinterface from '../../components/chat/Chatinterface';
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -117,7 +118,7 @@ const DocumentDetailPage = () => {
 
   const renderChat = () => (
     <div className="text-sm text-slate-500">
-      Chat feature coming soon
+      <Chatinterface />
     </div>
   );
 
