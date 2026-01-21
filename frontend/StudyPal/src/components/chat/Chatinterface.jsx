@@ -2,13 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, MessageSquare, Sparkles } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import aiService from '../../services/aiService';
-import { useAuth } from '../../context/AuthContext';
 import Spinner from '../common/spinner';
 import MarkdownRenderer from '../common/MarkdownRender';
 
 const ChatInterface = () => {
   const { id: documentId } = useParams();
-  const { user } = useAuth();
 
   const [history, setHistory] = useState([]);
   const [message, setMessage] = useState('');
@@ -25,16 +23,16 @@ const ChatInterface = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [history]);
+  }, [history, loading]);
 
-  /* ================= FETCH HISTORY ================= */
+  /* ================= FETCH CHAT HISTORY ================= */
 
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
         setInitialLoading(true);
         const response = await aiService.getChatHistory(documentId);
-        setHistory(response.data || []);
+        setHistory(response?.data || []);
       } catch (error) {
         console.error('Failed to fetch chat history', error);
       } finally {
@@ -88,7 +86,7 @@ const ChatInterface = () => {
     }
   };
 
-  /* ================= MESSAGE RENDER ================= */
+  /* ================= MESSAGE UI ================= */
 
   const renderMessage = (msg, index) => {
     const isUser = msg.role === 'user';
@@ -100,7 +98,7 @@ const ChatInterface = () => {
       >
         <div
           className={`
-            max-w-[75%] px-4 py-3 rounded-2xl text-sm
+            max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed
             ${
               isUser
                 ? 'bg-slate-900 text-white'
@@ -118,7 +116,7 @@ const ChatInterface = () => {
     );
   };
 
-  /* ================= LOADING STATE ================= */
+  /* ================= INITIAL LOADING ================= */
 
   if (initialLoading) {
     return (
@@ -137,10 +135,11 @@ const ChatInterface = () => {
   /* ================= MAIN UI ================= */
 
   return (
-    <div className="flex flex-col h-[70vh] bg-white dark:bg-[#181b22] rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+    <div className="flex flex-col h-[70vh] bg-white dark:bg-[#181b22] rounded-2xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm">
+      
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-5 space-y-4">
-        {history.length === 0 && (
+        {history.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center h-full text-slate-500 text-sm">
             <Sparkles className="mb-2" />
             Ask questions about this document
@@ -148,6 +147,16 @@ const ChatInterface = () => {
         )}
 
         {history.map(renderMessage)}
+
+        {/* AI typing indicator */}
+        {loading && (
+          <div className="flex justify-start">
+            <div className="px-4 py-3 rounded-2xl bg-slate-100 dark:bg-[#232734] text-sm text-slate-500 italic">
+              AI is thinking…
+            </div>
+          </div>
+        )}
+
         <div ref={messageEndRef} />
       </div>
 
@@ -158,6 +167,7 @@ const ChatInterface = () => {
       >
         <input
           value={message}
+          disabled={loading}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Ask something about this document..."
           className="
@@ -165,6 +175,7 @@ const ChatInterface = () => {
             border border-slate-300 dark:border-slate-600
             bg-white dark:bg-[#1f2430]
             focus:outline-none focus:ring-2 focus:ring-slate-400
+            disabled:opacity-50
           "
         />
 

@@ -42,8 +42,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 //routes
 app.use('/api/auth', authRoutes)
 app.use('/api/documents', documentRoutes)
-app.use('api/flashcards', flashcardRoutes)
-app.use('api/ai', aiRoutes)
+app.use('/api/flashcards', flashcardRoutes)
+app.use('/api/ai', aiRoutes)
 app.use('/api/quizzes', quizRoutes)
 app.use('/api/progress', progressRoutes)
 
