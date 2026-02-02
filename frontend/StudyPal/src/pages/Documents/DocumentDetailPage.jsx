@@ -7,6 +7,7 @@ import { ArrowLeft, ExternalLink } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
 import Tabs from '../../components/common/Tabs';
 import Chatinterface from '../../components/chat/Chatinterface';
+import AiActions from '../../components/ai/AiActions';
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -124,7 +125,7 @@ const DocumentDetailPage = () => {
 
   const renderAIActions = () => (
     <div className="text-sm text-slate-500">
-      AI actions will appear here
+     <AiActions />
     </div>
   );
 
