@@ -131,7 +131,7 @@ const DocumentDetailPage = () => {
 
   const renderFlashcardsTab = () => (
     <div className="text-sm text-slate-500">
-      Flashcards loading...
+      <FlashcardManager documentId={id}/>
     </div>
   );
 
