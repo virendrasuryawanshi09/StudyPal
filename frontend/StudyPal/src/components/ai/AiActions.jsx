@@ -50,108 +50,88 @@ const AiActions = () => {
 
   return (
     <>
-      {/* ================= AI ACTIONS (ONE BY ONE) ================= */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
 
-        {/* ================= GENERATE SUMMARY CARD ================= */}
-        <div className="group relative bg-white/80 dark:bg-[#181b22]/80
+        {/* ================= GENERATE SUMMARY ================= */}
+        <div className="bg-white/80 dark:bg-[#181b22]/80
           backdrop-blur-xl border border-slate-200/60 dark:border-slate-700/60
-          rounded-2xl shadow-lg transition-all
-          hover:shadow-2xl hover:-translate-y-1">
+          rounded-2xl shadow-sm px-6 py-4">
 
-          {/* Header */}
-          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200/60 dark:border-slate-700/60">
-            <div className="w-11 h-11 rounded-xl bg-indigo-100 dark:bg-indigo-500/20
-              flex items-center justify-center">
-              <Sparkles className="text-indigo-600 dark:text-indigo-400" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold">AI Summary</h3>
-              <p className="text-xs text-slate-500">One-click document overview</p>
-            </div>
-          </div>
+          <div className="flex items-center justify-between gap-6">
+            
+            {/* LEFT CONTENT */}
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-500/20
+                flex items-center justify-center">
+                <Sparkles className="text-indigo-600 dark:text-indigo-400" />
+              </div>
 
-          {/* Body */}
-          <div className="p-6 space-y-4">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Instantly generate a clear, concise summary of the entire document using AI.
-            </p>
-
-            {/* ✅ Right aligned button */}
-            <div className="flex justify-end">
-              <button
-                onClick={handleGenerateSummary}
-                disabled={loadingAction === "summary"}
-                className="h-10 px-6 rounded-xl
-                  bg-gradient-to-r from-indigo-600 to-blue-600
-                  text-white text-sm font-medium
-                  flex items-center gap-2
-                  transition-all hover:opacity-90
-                  disabled:opacity-50"
-              >
-                {loadingAction === "summary" ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    Generating…
-                  </>
-                ) : (
-                  "Generate Summary"
-                )}
-              </button>
+              <div>
+                <h3 className="text-sm font-semibold">Generate Summary</h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Get a concise summary of the entire document.
+                </p>
+              </div>
             </div>
+
+            {/* RIGHT BUTTON */}
+            <button
+              onClick={handleGenerateSummary}
+              disabled={loadingAction === "summary"}
+              className="h-9 px-5 rounded-lg text-sm font-medium
+                bg-indigo-600 text-white
+                disabled:opacity-50 whitespace-nowrap"
+            >
+              {loadingAction === "summary" ? "Loading…" : "Summarize"}
+            </button>
           </div>
         </div>
 
-        {/* ================= EXPLAIN CONCEPT CARD ================= */}
-        <div className="group relative bg-white/80 dark:bg-[#181b22]/80
+        {/* ================= EXPLAIN CONCEPT ================= */}
+        <div className="bg-white/80 dark:bg-[#181b22]/80
           backdrop-blur-xl border border-slate-200/60 dark:border-slate-700/60
-          rounded-2xl shadow-lg transition-all
-          hover:shadow-2xl hover:-translate-y-1">
+          rounded-2xl shadow-sm px-6 py-4">
 
-          {/* Header */}
-          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200/60 dark:border-slate-700/60">
-            <div className="w-11 h-11 rounded-xl bg-amber-100 dark:bg-amber-500/20
-              flex items-center justify-center">
-              <Lightbulb className="text-amber-600 dark:text-amber-400" />
+          <form
+            onSubmit={handleExplainConcept}
+            className="flex items-center justify-between gap-6"
+          >
+            {/* LEFT CONTENT */}
+            <div className="flex items-start gap-4 flex-1">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-500/20
+                flex items-center justify-center">
+                <Lightbulb className="text-amber-600 dark:text-amber-400" />
+              </div>
+
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold">Explain a Concept</h3>
+                <p className="text-xs text-slate-500 mt-1 mb-2">
+                  Enter a topic from the document to get a detailed explanation.
+                </p>
+
+                <input
+                  type="text"
+                  value={concept}
+                  onChange={(e) => setConcept(e.target.value)}
+                  placeholder="e.g. useState Hook"
+                  className="w-full px-3 py-2 rounded-lg border
+                    border-slate-300 dark:border-slate-600
+                    bg-white/60 dark:bg-[#232734]
+                    text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-semibold">Explain Concept</h3>
-              <p className="text-xs text-slate-500">Deep dive into any topic</p>
-            </div>
-          </div>
 
-          {/* Body */}
-          <form onSubmit={handleExplainConcept} className="p-6 space-y-4">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Enter any concept from the document and get a detailed AI explanation.
-            </p>
-
-            <input
-              type="text"
-              value={concept}
-              onChange={(e) => setConcept(e.target.value)}
-              placeholder="e.g. Normalization in DBMS"
-              disabled={loadingAction === "explain"}
-              className="w-full px-4 py-2.5 rounded-xl border
-                border-slate-300 dark:border-slate-600
-                bg-white/60 dark:bg-[#232734]
-                text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-            />
-
-            {/* ✅ Right aligned button */}
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={loadingAction === "explain" || !concept.trim()}
-                className="h-10 px-6 rounded-xl
-                  bg-gradient-to-r from-amber-500 to-orange-500
-                  text-white text-sm font-medium
-                  transition-all hover:opacity-90
-                  disabled:opacity-50"
-              >
-                {loadingAction === "explain" ? "Explaining…" : "Explain"}
-              </button>
-            </div>
+            {/* RIGHT BUTTON */}
+            <button
+              type="submit"
+              disabled={loadingAction === "explain" || !concept.trim()}
+              className="h-9 px-5 rounded-lg text-sm font-medium
+                bg-amber-500 text-white
+                disabled:opacity-50 whitespace-nowrap"
+            >
+              {loadingAction === "explain" ? "Loading…" : "Explain"}
+            </button>
           </form>
         </div>
 
