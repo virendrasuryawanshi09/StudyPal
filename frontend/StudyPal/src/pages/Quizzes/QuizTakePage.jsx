@@ -21,7 +21,6 @@ const QuizTakePage = () => {
         setLoading(true);
         const response = await quizService.getQuizById(quizId);
 
-        // If quiz is already completed, redirect to results page
         if (response.data?.completedAt) {
           navigate(`/quizzes/${quizId}/results`, { replace: true });
           return;
@@ -68,9 +67,7 @@ const QuizTakePage = () => {
       }));
 
       await quizService.submitQuiz(selectedQuiz._id, formattedAnswers);
-      toast.success("Quiz submitted successfully! Great job!");
-
-      // Navigate to results
+      toast.success("Quiz submitted successfully!");
       navigate(`/quizzes/${selectedQuiz._id}/results`);
 
     } catch (error) {
@@ -84,7 +81,6 @@ const QuizTakePage = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4">
         <Spinner />
-        <p className="text-slate-500 font-medium animate-pulse">Loading your challenge...</p>
       </div>
     );
   }
@@ -95,79 +91,73 @@ const QuizTakePage = () => {
   const allAnswered = answeredCount === selectedQuiz.questions.length;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
+    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 pb-12">
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gradient-to-r from-slate-900 to-orange-900 dark:to-orange-950 p-6 md:p-8 rounded-[2rem] text-white shadow-xl shadow-orange-900/20 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-slate-900 rounded-2xl p-6 md:p-8 text-slate-100 shadow-sm border border-slate-800">
 
-        <div className="relative z-10 w-full flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
           <div className="flex items-center gap-4 hidden md:flex">
-            <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl">
-              <Brain size={28} className="text-orange-300" />
+            <div className="p-3 bg-slate-800 rounded-xl">
+              <Brain size={24} className="text-slate-400" />
             </div>
             <div>
-              <h1 className="text-xl font-black text-white">{selectedQuiz.title}</h1>
-              <p className="text-orange-200 text-sm font-semibold max-w-sm truncate opacity-80 mt-0.5">Focus Mode • Take your time</p>
+              <h1 className="text-lg font-semibold text-white">{selectedQuiz.title}</h1>
+              <p className="text-slate-400 text-sm mt-0.5">Focus Mode</p>
             </div>
           </div>
 
           {/* Progress Bar Container */}
-          <div className="w-full md:w-1/2 flex flex-col gap-2 bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/10">
-            <div className="flex justify-between text-sm font-bold text-white mb-1">
-              <span className="opacity-80 uppercase tracking-widest text-[10px]">Progress</span>
-              <span className="bg-orange-500 px-2.5 py-0.5 rounded-md text-[11px] shadow-sm">
+          <div className="w-full md:w-1/2 flex flex-col gap-2 bg-slate-800 p-4 rounded-xl border border-slate-700">
+            <div className="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+              <span className="uppercase tracking-widest text-[10px] text-slate-500">Progress</span>
+              <span className="bg-slate-700 px-2 py-0.5 rounded text-[11px]">
                 {currentQuestionIndex + 1} / {selectedQuiz.questions.length}
               </span>
             </div>
-            <div className="h-2 w-full bg-black/20 rounded-full overflow-hidden shadow-inner">
+            <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full transition-all duration-500 ease-out relative"
+                className="h-full bg-emerald-500 rounded-full transition-all duration-500 ease-out relative"
                 style={{ width: `${((currentQuestionIndex + 1) / selectedQuiz.questions.length) * 100}%` }}
-              >
-                <div className="absolute inset-0 bg-white/30 w-full animate-[shimmer_2s_infinite]"></div>
-              </div>
+              ></div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Question Card */}
-      <div className="bg-white dark:bg-[#181b22] border border-slate-200/60 dark:border-slate-800 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 md:p-12 relative overflow-hidden group">
-
-        {/* Decorative Background Elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/10 dark:to-amber-900/10 rounded-full blur-3xl -mr-32 -mt-32 opacity-70 transition-opacity duration-700 pointer-events-none"></div>
+      <div className="bg-white dark:bg-[#181b22] border border-slate-200/60 dark:border-slate-800 rounded-[2rem] p-8 md:p-12 relative shadow-sm">
 
         <div className="relative z-10 flex flex-col items-center">
-          <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-slate-50 dark:bg-slate-800 text-orange-600 dark:text-orange-400 font-bold text-2xl mb-8 shadow-sm ring-8 ring-white dark:ring-[#181b22]">
+          <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#232734] text-slate-900 dark:text-slate-100 font-bold text-xl mb-6">
             {currentQuestionIndex + 1}
           </span>
 
-          <h3 className="text-2xl md:text-3xl font-black text-center text-slate-800 dark:text-white mb-10 leading-tight md:px-8">
+          <h3 className="text-2xl font-semibold text-center text-slate-900 dark:text-slate-100 mb-10 leading-relaxed md:px-8">
             {question.question}
           </h3>
 
-          <div className="w-full max-w-2xl space-y-4">
+          <div className="w-full max-w-2xl space-y-3">
             {question.options.map((option, idx) => {
               const isSelected = answers[currentQuestionIndex] === option;
               return (
                 <button
                   key={idx}
                   onClick={() => handleAnswerSelect(currentQuestionIndex, option)}
-                  className={`w-full text-left p-6 rounded-2xl border-2 transition-all duration-300 flex items-center gap-5 group/btn ${isSelected
-                      ? "border-orange-500 bg-orange-50 dark:bg-orange-900/30 shadow-[0_0_25px_rgba(99,102,241,0.2)] scale-[1.02]"
-                      : "border-slate-100 dark:border-slate-800 hover:border-orange-200 dark:hover:border-orange-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:shadow-md"
+                  className={`w-full text-left p-5 rounded-xl border transition-all duration-200 flex items-center gap-4 group/btn ${isSelected
+                      ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10"
+                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-[#181b22] hover:bg-slate-50 dark:hover:bg-[#232734]"
                     }`}
                 >
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-xl text-lg font-bold transition-colors shadow-sm ${isSelected ? "bg-orange-600 text-white" : "bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 group-hover/btn:bg-orange-100 dark:group-hover/btn:bg-orange-900 group-hover/btn:text-orange-600"
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-lg text-sm font-semibold transition-colors ${isSelected ? "bg-emerald-500 text-white" : "bg-slate-100 dark:bg-[#232734] text-slate-500 dark:text-slate-400 group-hover/btn:text-slate-700 dark:group-hover/btn:text-slate-200"
                     }`}>
                     {String.fromCharCode(65 + idx)}
                   </div>
-                  <span className={`text-lg font-semibold flex-1 ${isSelected ? "text-orange-900 dark:text-orange-100" : "text-slate-700 dark:text-slate-300"}`}>
+                  <span className={`text-base font-medium flex-1 ${isSelected ? "text-emerald-700 dark:text-emerald-400" : "text-slate-700 dark:text-slate-300"}`}>
                     {option}
                   </span>
                   {isSelected && (
-                    <CheckCircle className="text-orange-500 animate-in zoom-in duration-300 shrink-0" size={24} />
+                    <CheckCircle className="text-emerald-500 shrink-0" size={20} />
                   )}
                 </button>
               );
@@ -181,9 +171,9 @@ const QuizTakePage = () => {
         <button
           onClick={handlePrevQuestion}
           disabled={currentQuestionIndex === 0}
-          className="flex items-center justify-center w-14 h-14 md:w-auto md:px-6 md:h-14 rounded-2xl font-bold uppercase tracking-wider text-sm text-slate-500 dark:text-slate-400 bg-white dark:bg-[#181b22] border border-slate-200/60 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:shadow-sm"
+          className="flex items-center justify-center w-12 h-12 md:w-auto md:px-6 md:h-12 rounded-xl font-semibold text-sm text-slate-600 dark:text-slate-400 bg-white dark:bg-[#181b22] border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#232734] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
         >
-          <ChevronLeft size={20} className="md:mr-2" />
+          <ChevronLeft size={18} className="md:mr-2" />
           <span className="hidden md:inline">Previous</span>
         </button>
 
@@ -191,14 +181,14 @@ const QuizTakePage = () => {
           <button
             onClick={handleSubmitQuiz}
             disabled={!allAnswered || submitting}
-            className="flex-1 max-w-[280px] flex items-center justify-center gap-2 h-14 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl shadow-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none hover:scale-105 active:scale-95"
+            className="flex-1 max-w-[240px] flex items-center justify-center gap-2 h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? "Submitting..." : "Submit Quiz"}
           </button>
         ) : (
           <button
             onClick={handleNextQuestion}
-            className="flex-1 max-w-[280px] flex items-center justify-center gap-2 h-14 bg-slate-900 dark:bg-orange-600 hover:bg-slate-800 dark:hover:bg-orange-700 text-white rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl shadow-slate-900/20 dark:shadow-orange-600/20 hover:scale-105 active:scale-95"
+            className="flex-1 max-w-[240px] flex items-center justify-center gap-2 h-12 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 rounded-xl font-semibold text-sm transition-all"
           >
             Next Question
             <ChevronRight size={18} />
@@ -207,14 +197,8 @@ const QuizTakePage = () => {
       </div>
 
       {!allAnswered && isLastQuestion && (
-        <div className="flex justify-center animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <p className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900 text-amber-600 dark:text-amber-400 px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
-            </span>
-            {selectedQuiz.questions.length - answeredCount} questions remaining before you can submit.
-          </p>
+        <div className="flex justify-center text-sm font-medium text-amber-600 dark:text-amber-500">
+          {selectedQuiz.questions.length - answeredCount} questions remaining before you can submit.
         </div>
       )}
     </div>

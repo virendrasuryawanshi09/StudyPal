@@ -35,63 +35,63 @@ const FlashcardsListPage = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
+    <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-500">
 
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-6 border-b border-slate-200/60 dark:border-slate-800">
         <div>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-3">
+          <h1 className="text-3xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Your Flashcards
           </h1>
-          <p className="text-lg text-slate-500 dark:text-slate-400 max-w-xl leading-relaxed">
-            Review, master, and test your knowledge. You have <span className="font-bold text-orange-600 dark:text-orange-400">{sets.length}</span> collections in your personal deck.
+          <p className="text-slate-500 dark:text-slate-400 max-w-xl">
+            Review, master, and test your knowledge. You have <span className="font-semibold text-slate-700 dark:text-slate-300">{sets.length}</span> collections in your personal deck.
           </p>
         </div>
 
         {sets.length > 0 && (
-          <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl self-start md:self-auto border border-slate-200/60 dark:border-slate-700">
+          <div className="flex bg-slate-100 dark:bg-[#181b22] p-1.5 rounded-xl self-start md:self-auto border border-slate-200/60 dark:border-slate-700">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2.5 rounded-lg transition-all ${viewMode === "grid"
-                  ? "bg-white dark:bg-slate-700 text-orange-600 dark:text-orange-400 shadow-sm"
+              className={`p-2 rounded-lg transition-colors ${viewMode === "grid"
+                  ? "bg-white dark:bg-[#232734] text-slate-900 dark:text-slate-100 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
                 }`}
             >
-              <LayoutGrid size={20} />
+              <LayoutGrid size={18} />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2.5 rounded-lg transition-all ${viewMode === "list"
-                  ? "bg-white dark:bg-slate-700 text-orange-600 dark:text-orange-400 shadow-sm"
+              className={`p-2 rounded-lg transition-colors ${viewMode === "list"
+                  ? "bg-white dark:bg-[#232734] text-slate-900 dark:text-slate-100 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
                 }`}
             >
-              <LayoutList size={20} />
+              <LayoutList size={18} />
             </button>
           </div>
         )}
       </div>
 
       {sets.length === 0 ? (
-        <div className="py-24 bg-white/50 dark:bg-slate-800/30 backdrop-blur-sm border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl flex flex-col items-center justify-center">
-          <div className="w-24 h-24 bg-orange-50 dark:bg-orange-900/40 text-orange-500 rounded-full flex items-center justify-center mb-6 shadow-inner ring-8 ring-orange-50/50">
-            <CopyPlus size={40} />
+        <div className="py-24 bg-white dark:bg-[#181b22] border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl flex flex-col items-center justify-center">
+          <div className="w-16 h-16 bg-slate-100 dark:bg-[#232734] text-slate-500 rounded-xl flex items-center justify-center mb-6">
+            <CopyPlus size={28} />
           </div>
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-3">No Flashcards Found</h2>
-          <p className="text-slate-500 dark:text-slate-400 max-w-md text-center mb-8">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">No Flashcards Found</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md text-center mb-6">
             Upload a document and let our AI generate a complete study deck for you instantly.
           </p>
           <Link
             to="/documents"
-            className="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-2xl shadow-xl shadow-orange-500/20 transition-all hover:-translate-y-1 hover:shadow-orange-500/30 flex items-center gap-2"
+            className="px-6 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold rounded-xl transition-colors hover:opacity-90 flex items-center gap-2"
           >
-            Go to Documents <ArrowRight size={20} />
+            Go to Documents <ArrowRight size={18} />
           </Link>
         </div>
       ) : (
         <div className={
           viewMode === "grid"
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
             : "flex flex-col space-y-4"
         }>
           {sets.map((set, index) => {
@@ -102,51 +102,37 @@ const FlashcardsListPage = () => {
               <Link
                 key={set._id}
                 to={`/documents/${set.documentId?._id}`}
-                className={`group relative overflow-hidden bg-white dark:bg-[#181b22] border border-slate-200/60 dark:border-slate-800 rounded-[2rem] transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(79,70,229,0.15)] hover:-translate-y-1
-                  ${isGrid ? "p-8 flex flex-col" : "p-6 flex items-center justify-between"}
+                className={`group relative bg-white dark:bg-[#181b22] border border-slate-200/60 dark:border-slate-800 rounded-2xl transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600
+                  ${isGrid ? "p-6 flex flex-col h-full" : "p-4 flex items-center justify-between"}
                 `}
               >
-                {/* Decorative Elements for Grid Mode */}
-                {isGrid && (
-                  <>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-bl-[60px] -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                    <div className="absolute top-6 right-6 p-3 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-2xl shadow-sm text-orange-500 z-10 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300">
-                      <Layers size={24} />
-                    </div>
-                  </>
-                )}
-
-                <div className={`${isGrid ? "mb-auto" : "flex items-center gap-6"}`}>
+                <div className={`${isGrid ? "mb-auto" : "flex items-center gap-4"}`}>
                   {!isGrid && (
-                    <div className="p-4 bg-orange-50 dark:bg-orange-900/20 text-orange-500 rounded-2xl">
-                      <Layers size={24} />
+                    <div className="p-3 bg-slate-100 dark:bg-[#232734] text-slate-500 rounded-xl">
+                      <Layers size={20} />
                     </div>
                   )}
 
-                  <div className="z-10 relative">
+                  <div>
                     {/* Status Badge */}
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider rounded-lg mb-4">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex shrink-0"></span>
+                    <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-slate-100 dark:bg-[#232734] text-slate-600 dark:text-slate-300 text-xs font-semibold uppercase tracking-wider rounded border border-slate-200 dark:border-slate-700/50 mb-3">
                       Ready
                     </span>
 
-                    <h3 className={`font-black text-slate-800 dark:text-white leading-tight mb-3 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors ${isGrid ? 'text-2xl mt-4' : 'text-xl mb-1'}`}>
+                    <h3 className={`font-semibold text-slate-800 dark:text-slate-100 leading-tight mb-2 group-hover:text-emerald-500 transition-colors ${isGrid ? 'text-lg mt-2' : 'text-md mb-1'}`}>
                       {documentTitle}
                     </h3>
 
                     {/* Meta for Grid */}
                     {isGrid && (
-                      <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2 mb-8">
-                        <span className="flex items-center justify-center bg-slate-100 dark:bg-slate-800 w-8 h-8 rounded-full text-slate-600 dark:text-slate-300 font-bold text-sm">
-                          {set.cards.length}
-                        </span>
-                        cards in set
+                      <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-4">
+                        {set.cards.length} cards in set
                       </p>
                     )}
 
                     {/* Meta for List */}
                     {!isGrid && (
-                      <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                         {set.cards.length} cards • Created {moment(set.createdAt).fromNow()}
                       </p>
                     )}
@@ -155,22 +141,22 @@ const FlashcardsListPage = () => {
 
                 {/* Footer for Grid Mode */}
                 {isGrid && (
-                  <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between z-10 relative bg-white dark:bg-[#181b22]">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-400">
-                      <Clock size={16} />
+                  <div className="pt-4 mt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                      <Clock size={14} />
                       {moment(set.createdAt).fromNow()}
                     </div>
 
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 group-hover:bg-orange-600 text-slate-400 group-hover:text-white transition-all duration-300">
-                      <ArrowRight size={18} className="transform group-hover:translate-x-1 transition-transform" />
+                    <div className="text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-all duration-300">
+                      <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
                 )}
 
                 {/* Arrow for List Mode */}
                 {!isGrid && (
-                  <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800 group-hover:bg-orange-600 text-slate-400 group-hover:text-white transition-all duration-300">
-                    <ArrowRight size={20} className="transform group-hover:translate-x-1 transition-transform" />
+                  <div className="text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-all duration-300">
+                    <ArrowRight size={18} className="transform group-hover:translate-x-1 transition-transform" />
                   </div>
                 )}
               </Link>
