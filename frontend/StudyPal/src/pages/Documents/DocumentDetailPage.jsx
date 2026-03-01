@@ -8,6 +8,8 @@ import PageHeader from '../../components/common/PageHeader';
 import Tabs from '../../components/common/Tabs';
 import Chatinterface from '../../components/chat/Chatinterface';
 import AiActions from '../../components/ai/AiActions';
+import FlashcardManager from '../../components/flashcards/FlashcardManager';
+import QuizManager from '../../components/quizzes/QuizManager';
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -125,19 +127,19 @@ const DocumentDetailPage = () => {
 
   const renderAIActions = () => (
     <div className="text-sm text-slate-500">
-     <AiActions />
+      <AiActions />
     </div>
   );
 
   const renderFlashcardsTab = () => (
     <div className="text-sm text-slate-500">
-      <FlashcardManager documentId={id}/>
+      <FlashcardManager documentId={id} />
     </div>
   );
 
   const renderQuizzesTab = () => (
     <div className="text-sm text-slate-500">
-      Quizzes loading...
+      <QuizManager documentId={id} />
     </div>
   );
 

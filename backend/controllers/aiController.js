@@ -31,15 +31,46 @@ export const generateFlashcards = async (req, res, next) => {
             });
         }
 
-        const cards = await geminiService.generateFlashcards(
+        let cards = await geminiService.generateFlashcards(
             document.extractedText,
             Number(count)
         );
 
-        if (!cards || cards.length === 0) {
+        console.log("========== GEMINI RAW RESPONSE START ==========");
+        console.log(cards);
+        console.log("TYPE OF CARDS:", typeof cards);
+        console.log("========== GEMINI RAW RESPONSE END ==========");
+
+        // ✅ Convert Gemini Q/A text format into array
+        if (typeof cards === "string") {
+
+            const flashcardsArray = [];
+
+            const blocks = cards.split("\n\n");
+
+            for (let block of blocks) {
+                const questionMatch = block.match(/Q:\s*(.*)/);
+                const answerMatch = block.match(/A:\s*(.*)/);
+
+                if (questionMatch && answerMatch) {
+                    flashcardsArray.push({
+                        question: questionMatch[1].trim(),
+                        answer: answerMatch[1].trim(),
+                        difficulty: "medium",
+                        reviewCount: 0,
+                        isStarred: false,
+                    });
+                }
+            }
+
+            cards = flashcardsArray;
+        }
+
+        // ✅ Final Safety Validation
+        if (!Array.isArray(cards) || cards.length === 0) {
             return res.status(500).json({
                 success: false,
-                error: 'Failed to generate flashcards',
+                error: "Failed to generate valid flashcards",
             });
         }
 
@@ -49,7 +80,7 @@ export const generateFlashcards = async (req, res, next) => {
             cards: cards.map(card => ({
                 question: card.question,
                 answer: card.answer,
-                difficulty: card.difficulty,
+                difficulty: card.difficulty || "medium",
                 reviewCount: 0,
                 isStarred: false,
             })),
@@ -60,7 +91,9 @@ export const generateFlashcards = async (req, res, next) => {
             data: flashcardSet,
             message: 'Flashcards generated successfully',
         });
+
     } catch (error) {
+        console.error("FLASHCARD GENERATION ERROR:", error.message);
         next(error);
     }
 };
@@ -267,11 +300,11 @@ export const explainConcept = async (req, res, next) => {
             Array.isArray(document.chunks) && document.chunks.length > 0
                 ? document.chunks
                 : [
-                      {
-                          chunkIndex: 0,
-                          content: document.extractedText,
-                      },
-                  ];
+                    {
+                        chunkIndex: 0,
+                        content: document.extractedText,
+                    },
+                ];
 
         let relevantChunks = findRelevantChunks(chunks, concept, 3);
 

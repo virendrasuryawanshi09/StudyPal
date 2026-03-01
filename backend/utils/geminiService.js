@@ -7,7 +7,7 @@ if (!process.env.GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY is missing in .env");
 }
 
-const GEMINI_URL ="https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent";
 
 
 
@@ -111,13 +111,29 @@ export const generateQuiz = async (text, count = 5) => {
   try {
     const prompt = `
 Create ${count} multiple choice questions (MCQs) from the text.
-
-Each question should have 4 options and mark the correct answer.
+Return ONLY a valid JSON array of objects. Do NOT use markdown code blocks (\`\`\`json). Just the raw JSON.
+Each object must have the exact following structure with no other fields:
+{
+  "question": "The question text",
+  "options": ["Option A", "Option B", "Option C", "Option D"],
+  "correctAnswer": "The exact string of the correct option",
+  "explanation": "A short explanation of why it is correct",
+  "difficulty": "medium"
+}
 
 Text:
 ${text.slice(0, 8000)}
 `;
-    return await callGemini(prompt);
+    const resString = await callGemini(prompt);
+
+    // Attempt to clean and parse the response
+    let cleanedString = resString.trim();
+    if (cleanedString.startsWith('```json')) cleanedString = cleanedString.slice(7);
+    if (cleanedString.startsWith('```')) cleanedString = cleanedString.slice(3);
+    if (cleanedString.endsWith('```')) cleanedString = cleanedString.slice(0, -3);
+    cleanedString = cleanedString.trim();
+
+    return JSON.parse(cleanedString);
   } catch (err) {
     console.error("QUIZ ERROR:", err);
     throw err;

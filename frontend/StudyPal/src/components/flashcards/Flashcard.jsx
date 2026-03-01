@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Flashcard = ({flashcard, onToggle}) => {
+const Flashcard = ({flashcard, onToggleStar}) => {
     const [isFlapped, setIsFlapped] = React.useState(false);
     const handleFlip = () => {
         setIsFlapped(!isFlapped);
