@@ -1,4 +1,6 @@
 import Flashcard from '../models/Flashcard.js';
+import User from '../models/User.js';
+import moment from 'moment';
 
 export const getFlashcards = async (req, res, next) => {
     try {
@@ -67,6 +69,27 @@ export const reviewFlashcard = async (req, res, next) => {
 
         await flashcardSet.save();
 
+        // --- UPDATE USER POINTS AND STREAK ---
+        const user = await User.findById(req.user._id);
+        if (user) {
+            user.points = (user.points || 0) + 5;
+            const today = moment().startOf('day');
+            if (user.lastStudyDate) {
+                const lastDate = moment(user.lastStudyDate).startOf('day');
+                const diff = today.diff(lastDate, 'days');
+                if (diff === 1) {
+                    user.studyStreak += 1;
+                } else if (diff > 1) {
+                    user.studyStreak = 1;
+                }
+            } else {
+                user.studyStreak = 1;
+            }
+            user.lastStudyDate = today.toDate();
+            user.pointsLevel = Math.floor(user.points / 100) + 1;
+            await user.save();
+        }
+
         res.status(200).json({
             success: true,
             data: flashcardSet,
@@ -112,9 +135,8 @@ export const toggleStarFlashcard = async (req, res, next) => {
         res.status(200).json({
             success: true,
             data: flashcardSet,
-            message: `Flashcard ${
-                flashcardSet.cards[cardIndex].isStarred ? 'starred' : 'unstarred'
-            }`
+            message: `Flashcard ${flashcardSet.cards[cardIndex].isStarred ? 'starred' : 'unstarred'
+                }`
         });
     } catch (error) {
         next(error);
