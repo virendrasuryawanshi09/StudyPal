@@ -1,6 +1,7 @@
 import Document from '../models/Document.js';
 import Flashcard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
+import User from '../models/User.js';
 
 
 export const getDashboard = async (req, res, next) => {
@@ -45,8 +46,10 @@ export const getDashboard = async (req, res, next) => {
             .populate('documentId', 'title')
             .select('title score totalQuestions completedAt');
 
-        // Study streak (simplified – in production, track daily activity)
-        const studyStreak = Math.floor(Math.random() * 7) + 1; // Mock data
+        const user = await User.findById(userId);
+        const studyStreak = user?.studyStreak || 0;
+        const points = user?.points || 0;
+        const pointsLevel = user?.pointsLevel || 1;
 
         res.status(200).json({
             success: true,
@@ -60,7 +63,9 @@ export const getDashboard = async (req, res, next) => {
                     totalQuizzes,
                     completedQuizzes,
                     averageScore,
-                    studyStreak
+                    studyStreak,
+                    points,
+                    pointsLevel
                 },
                 recentActivity: {
                     documents: recentDocuments,

@@ -1,4 +1,6 @@
 import Quiz from '../models/Quiz.js';
+import User from '../models/User.js';
+import moment from 'moment';
 
 export const getQuizzes = async (req, res, next) => {
     try {
@@ -105,6 +107,35 @@ export const submitQuiz = async (req, res, next) => {
 
         await quiz.save();
 
+        // --- UPDATE USER POINTS AND STREAK ---
+        const user = await User.findById(req.user._id);
+        if (user) {
+            // Award points: 10 base + score
+            const pointsToAdd = 10 + Math.floor(score / 2);
+            user.points = (user.points || 0) + pointsToAdd;
+
+            // Update streak
+            const today = moment().startOf('day');
+            if (user.lastStudyDate) {
+                const lastDate = moment(user.lastStudyDate).startOf('day');
+                const diff = today.diff(lastDate, 'days');
+
+                if (diff === 1) {
+                    user.studyStreak += 1;
+                } else if (diff > 1) {
+                    user.studyStreak = 1;
+                }
+            } else {
+                user.studyStreak = 1;
+            }
+            user.lastStudyDate = today.toDate();
+
+            // Level up every 100 points
+            user.pointsLevel = Math.floor(user.points / 100) + 1;
+
+            await user.save();
+        }
+
         res.status(200).json({
             success: true,
             data: {
@@ -197,7 +228,7 @@ export const deleteQuiz = async (req, res, next) => {
 
         await quiz.deleteOne();
 
-        res.status(200).json ({
+        res.status(200).json({
             success: true,
             message: 'Quiz deleted successfully'
         });

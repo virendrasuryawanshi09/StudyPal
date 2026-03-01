@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Please add a username'],
         unique: true,
         trim: true,
-        minlength: [3,'Username must be at least 3 characters long'],
+        minlength: [3, 'Username must be at least 3 characters long'],
     },
     email: {
         type: String,
@@ -23,12 +23,28 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Please add a password'],
-        minlength: [6,'Password must be at least 6 characters long'],
+        minlength: [6, 'Password must be at least 6 characters long'],
         select: false,
     },
     profileImage: {
         type: String,
         default: null,
+    },
+    points: {
+        type: Number,
+        default: 0,
+    },
+    pointsLevel: {
+        type: Number,
+        default: 1,
+    },
+    lastStudyDate: {
+        type: Date,
+        default: null,
+    },
+    studyStreak: {
+        type: Number,
+        default: 0,
     }
 }, {
     timestamps: true,

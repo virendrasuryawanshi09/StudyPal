@@ -7,7 +7,7 @@ if (!process.env.GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY is missing in .env");
 }
 
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
 
 
@@ -25,12 +25,20 @@ async function callGemini(prompt) {
             role: "user",
             parts: [{ text: prompt }]
           }
-        ]
+        ],
+        generationConfig: {
+          response_mime_type: "application/json"
+        }
       })
     }
   );
 
   const data = await res.json();
+
+  if (data.error) {
+    console.error("GEMINI API ERROR:", data.error);
+    throw new Error(data.error.message || "Gemini API Error");
+  }
 
   if (!data.candidates || !data.candidates.length) {
     console.error("GEMINI RAW RESPONSE:", data);
@@ -92,8 +100,8 @@ export const generateFlashcards = async (text, count = 10) => {
 Create ${count} flashcards from the text below.
 
 Format strictly as:
-Q:
-A:
+Q: [Question]
+A: [Answer]
 
 Text:
 ${text.slice(0, 8000)}
@@ -111,8 +119,8 @@ export const generateQuiz = async (text, count = 5) => {
   try {
     const prompt = `
 Create ${count} multiple choice questions (MCQs) from the text.
-Return ONLY a valid JSON array of objects. Do NOT use markdown code blocks (\`\`\`json). Just the raw JSON.
-Each object must have the exact following structure with no other fields:
+Return ONLY a valid JSON array of objects.
+Each object must have the exact following structure:
 {
   "question": "The question text",
   "options": ["Option A", "Option B", "Option C", "Option D"],
@@ -128,14 +136,23 @@ ${text.slice(0, 8000)}
 
     // Attempt to clean and parse the response
     let cleanedString = resString.trim();
-    if (cleanedString.startsWith('```json')) cleanedString = cleanedString.slice(7);
-    if (cleanedString.startsWith('```')) cleanedString = cleanedString.slice(3);
-    if (cleanedString.endsWith('```')) cleanedString = cleanedString.slice(0, -3);
-    cleanedString = cleanedString.trim();
 
-    return JSON.parse(cleanedString);
+    // Sometimes Gemini still wraps in code blocks even if told not to
+    if (cleanedString.includes("```")) {
+      const match = cleanedString.match(/```(?:json)?([\s\S]*?)```/);
+      if (match) {
+        cleanedString = match[1].trim();
+      }
+    }
+
+    try {
+      return JSON.parse(cleanedString);
+    } catch (parseError) {
+      console.error("JSON PARSE ERROR. Raw string:", resString);
+      throw new Error("Failed to parse quiz JSON from AI response");
+    }
   } catch (err) {
-    console.error("QUIZ ERROR:", err);
+    console.error("QUIZ GENERATION ERROR:", err);
     throw err;
   }
 };
