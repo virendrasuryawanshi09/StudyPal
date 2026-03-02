@@ -4,6 +4,7 @@ import Quiz from '../models/Quiz.js';
 import { extractTextFromPDF } from '../utils/pdfParser.js';
 import { chunkText } from '../utils/textChunker.js';
 import fs from 'fs/promises';
+import fsSync from 'fs';
 import path from 'path';
 import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
@@ -11,10 +12,18 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const logError = (type, error) => {
+  const logMsg = `[${new Date().toISOString()}] ${type}: ${error.stack || error}\n`;
+  try {
+    fsSync.appendFileSync('backend_errors.log', logMsg);
+  } catch (e) {
+    console.error('Failed to write to log file', e);
+  }
+};
+
 /* ================= UPLOAD DOCUMENT ================= */
 
 export const uploadDocument = async (req, res, next) => {
-
   const processPDF = async (documentId, filePath) => {
     try {
       const { text } = await extractTextFromPDF(filePath);
@@ -29,6 +38,7 @@ export const uploadDocument = async (req, res, next) => {
       console.log(`Document ${documentId} processed successfully.`);
     } catch (err) {
       console.error('PDF processing error', err);
+      logError('PDF PROCESSING ERROR', err);
       await Document.findByIdAndUpdate(documentId, { status: 'failed' });
     }
   };
@@ -44,7 +54,7 @@ export const uploadDocument = async (req, res, next) => {
     const { title } = req.body;
 
     if (!title) {
-      await fs.unlink(req.file.path);
+      await fs.unlink(req.file.path).catch(() => { });
       return res.status(400).json({
         success: false,
         error: 'Please provide a document title'
@@ -58,12 +68,11 @@ export const uploadDocument = async (req, res, next) => {
       userId: req.user._id,
       title,
       fileName: req.file.originalname,
-      filePath: fileUrl, // URL for frontend
+      filePath: fileUrl,
       fileSize: req.file.size,
       status: 'processing'
     });
 
-    // Async processing
     processPDF(document._id, req.file.path);
 
     res.status(201).json({
@@ -74,9 +83,10 @@ export const uploadDocument = async (req, res, next) => {
 
   } catch (error) {
     if (req.file?.path) {
-      await fs.unlink(req.file.path).catch(() => {});
+      await fs.unlink(req.file.path).catch(() => { });
     }
-    next(error);
+    logError('UPLOAD ERROR', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -125,7 +135,8 @@ export const getDocuments = async (req, res, next) => {
       data: documents
     });
   } catch (error) {
-    next(error);
+    logError('GET DOCUMENTS ERROR', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -167,7 +178,8 @@ export const getDocument = async (req, res, next) => {
       data: documentData
     });
   } catch (error) {
-    next(error);
+    logError('GET DOCUMENT ERROR', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -187,15 +199,12 @@ export const deleteDocument = async (req, res, next) => {
       });
     }
 
-    // Convert URL → local file path
     const filename = path.basename(document.filePath);
-    const filePath = path.join(
-      __dirname,
-      '../uploads/documents',
-      filename
-    );
+    const filePath = path.join(__dirname, '../uploads/documents', filename);
 
-    await fs.unlink(filePath); 
+    if (filePath && !document.filePath.startsWith('http')) {
+      await fs.unlink(filePath).catch(err => console.error("Failed to delete local file:", err.message));
+    }
 
     await document.deleteOne();
 
@@ -204,7 +213,7 @@ export const deleteDocument = async (req, res, next) => {
       message: 'Document deleted successfully'
     });
   } catch (error) {
-    next(error);
+    logError('DELETE DOCUMENT ERROR', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
-

@@ -10,8 +10,32 @@
 @layer base {
     html {
         font-family: var(--font-display);
+        background-color: #0f1115;
     }
+
     body {
-        background-color: #F9F9F9;
+        background-color: #0f1115 !important;
+        color: #f1f5f9 !important;
+    }
+
+    /* Global Overrides for Light-Mode Hardcoded Styles */
+    .bg-white:not(.dark .bg-white) {
+        background-color: #181b22 !important;
+    }
+
+    .bg-slate-50:not(.dark .bg-slate-50) {
+        background-color: #0f1115 !important;
+    }
+
+    .bg-slate-100:not(.dark .bg-slate-100) {
+        background-color: #1f2430 !important;
+    }
+
+    .text-slate-900:not(.dark .text-slate-900) {
+        color: #f1f5f9 !important;
+    }
+
+    .border-slate-200:not(.dark .border-slate-200) {
+        border-color: #334155 !important;
     }
 }

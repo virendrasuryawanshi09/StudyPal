@@ -4,6 +4,16 @@ import Quiz from '../models/Quiz.js';
 import ChatHistory from '../models/ChatHistory.js';
 import * as geminiService from '../utils/geminiService.js';
 import { findRelevantChunks } from '../utils/textChunker.js';
+import fs from 'fs';
+
+const logError = (type, error) => {
+    const logMsg = `[${new Date().toISOString()}] ${type}: ${error.stack || error}\n`;
+    try {
+        fs.appendFileSync('c:\\StudyPal\\backend\\backend_errors.log', logMsg);
+    } catch (e) {
+        console.error('Failed to write to log file', e);
+    }
+};
 
 /* ---------------------- FLASHCARDS ---------------------- */
 
@@ -41,17 +51,12 @@ export const generateFlashcards = async (req, res, next) => {
         console.log("TYPE OF CARDS:", typeof cards);
         console.log("========== GEMINI RAW RESPONSE END ==========");
 
-        // ✅ Convert Gemini Q/A text format into array
         if (typeof cards === "string") {
-
             const flashcardsArray = [];
-
             const blocks = cards.split("\n\n");
-
             for (let block of blocks) {
                 const questionMatch = block.match(/Q:\s*(.*)/);
                 const answerMatch = block.match(/A:\s*(.*)/);
-
                 if (questionMatch && answerMatch) {
                     flashcardsArray.push({
                         question: questionMatch[1].trim(),
@@ -62,11 +67,9 @@ export const generateFlashcards = async (req, res, next) => {
                     });
                 }
             }
-
             cards = flashcardsArray;
         }
 
-        // ✅ Final Safety Validation
         if (!Array.isArray(cards) || cards.length === 0) {
             return res.status(500).json({
                 success: false,
@@ -93,8 +96,8 @@ export const generateFlashcards = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error("FLASHCARD GENERATION ERROR:", error.message);
-        next(error);
+        logError('FLASHCARD ERROR', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 };
 
@@ -152,7 +155,8 @@ export const generateQuiz = async (req, res, next) => {
             message: 'Quiz generated successfully',
         });
     } catch (error) {
-        next(error);
+        logError('QUIZ ERROR', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 };
 
@@ -203,7 +207,8 @@ export const generateSummary = async (req, res, next) => {
             message: 'Summary generated successfully',
         });
     } catch (error) {
-        next(error);
+        logError('SUMMARY ERROR', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 };
 
@@ -233,7 +238,6 @@ export const chat = async (req, res, next) => {
             });
         }
 
-        // ✅ HARD GUARANTEE CONTEXT EXISTS
         const baseText =
             document.extractedText && document.extractedText.trim().length > 0
                 ? document.extractedText
@@ -249,9 +253,8 @@ export const chat = async (req, res, next) => {
             relevantChunks = chunks.slice(0, 1);
         }
 
-        // 🔥 LOG ONCE (DEBUG)
         console.log('CHAT QUESTION:', question);
-        console.log('CHAT CONTEXT LENGTH:', relevantChunks[0].content.length);
+        console.log('CHAT CONTEXT LENGTH:', relevantChunks[0]?.content?.length || 0);
 
         const answer = await geminiService.chatWithContext(
             question,
@@ -264,11 +267,10 @@ export const chat = async (req, res, next) => {
             message: 'Response generated successfully',
         });
     } catch (error) {
-        console.error('CHAT CONTROLLER ERROR:', error.message);
-        next(error);
+        logError('CHAT ERROR', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 };
-
 
 /* ---------------------- EXPLAIN CONCEPT ---------------------- */
 
@@ -336,7 +338,8 @@ export const explainConcept = async (req, res, next) => {
             message: 'Explanation generated successfully',
         });
     } catch (error) {
-        next(error);
+        logError('EXPLAIN ERROR', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 };
 
@@ -364,6 +367,7 @@ export const getChatHistory = async (req, res, next) => {
             message: 'Chat history retrieved successfully',
         });
     } catch (error) {
-        next(error);
+        logError('CHAT HISTORY ERROR', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 };

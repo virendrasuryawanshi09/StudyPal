@@ -74,7 +74,8 @@ const QuizManager = ({ documentId }) => {
             toast.success("Quiz generated successfully!");
             fetchQuizzes();
         } catch (error) {
-            toast.error("Quiz generation failed. Please try again.");
+            const msg = error?.error || error?.message || "Quiz generation failed. Please try again.";
+            toast.error(msg);
         } finally {
             setGenerating(false);
         }

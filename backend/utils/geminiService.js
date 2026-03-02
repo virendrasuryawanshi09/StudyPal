@@ -7,45 +7,74 @@ if (!process.env.GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY is missing in .env");
 }
 
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 
 
 /* ---------------- HELPER ---------------- */
 
-async function callGemini(prompt) {
-  const res = await fetch(
-    `${GEMINI_URL}?key=${process.env.GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: prompt }]
-          }
-        ],
-        generationConfig: {
-          response_mime_type: "application/json"
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function callGemini(prompt, retries = 3) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(
+        `${GEMINI_URL}?key=${process.env.GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: prompt }]
+              }
+            ]
+          })
         }
-      })
+      );
+
+      const data = await res.json();
+
+      if (data.error) {
+        const status = data.error.status;
+        const message = data.error.message || "Gemini API Error";
+        console.error(`GEMINI API ERROR (attempt ${attempt}/${retries}):`, status, message);
+
+        // Rate limit — wait and retry
+        if ((status === "RESOURCE_EXHAUSTED" || res.status === 429) && attempt < retries) {
+          const waitMs = attempt * 3000; // 3s, 6s, 9s
+          console.log(`Rate limited. Retrying in ${waitMs}ms...`);
+          await sleep(waitMs);
+          continue;
+        }
+
+        // Quota truly exhausted or unrecoverable
+        if (status === "RESOURCE_EXHAUSTED") {
+          throw new Error("AI quota exceeded. Please wait a moment and try again.");
+        }
+
+        throw new Error(message);
+      }
+
+      if (!data.candidates || !data.candidates.length) {
+        console.error("GEMINI NO CANDIDATES:", JSON.stringify(data, null, 2).slice(0, 400));
+        throw new Error("No response from Gemini");
+      }
+
+      return data.candidates[0].content.parts[0].text;
+
+    } catch (err) {
+      if (attempt === retries) {
+        console.error("CALL_GEMINI FINAL FAILURE:", err.message);
+        throw err;
+      }
+      console.error(`CALL_GEMINI attempt ${attempt} failed:`, err.message);
+      await sleep(attempt * 2000);
     }
-  );
-
-  const data = await res.json();
-
-  if (data.error) {
-    console.error("GEMINI API ERROR:", data.error);
-    throw new Error(data.error.message || "Gemini API Error");
   }
-
-  if (!data.candidates || !data.candidates.length) {
-    console.error("GEMINI RAW RESPONSE:", data);
-    throw new Error("No response from Gemini");
-  }
-
-  return data.candidates[0].content.parts[0].text;
 }
 
 /* ---------------- CHAT WITH CONTEXT ---------------- */

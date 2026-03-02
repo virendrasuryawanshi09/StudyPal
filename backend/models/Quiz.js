@@ -22,6 +22,10 @@ const quizSchema = new mongoose.Schema({
         trim: true,
     },
     questions: [{
+        question: {
+            type: String,
+            required: [true, 'Please add a question'],
+        },
         options: {
             type: [String],
             required: [true, 'Please add options for the quiz'],

@@ -65,10 +65,9 @@ const DashboardPage = () => {
   const handleAiAnalysis = async () => {
     try {
       setGeneratingAi(true);
-      const docsRes = await documentService.getDocuments();
-      const docs = docsRes.data || [];
+      const docs = await documentService.getDocuments() || [];
 
-      if (docs.length === 0) {
+      if (!Array.isArray(docs) || docs.length === 0) {
         setAiAnalysis("No documents found to analyze. Please upload documents first.");
         setGeneratingAi(false);
         return;
@@ -78,7 +77,9 @@ const DashboardPage = () => {
       const prompt = `Based on the content of this document, please generate: 1) Suggestions on how I can improve my study productivity for this material to get full marks. 2) A detailed weekly timetable to master this subject. Format the response nicely using markdown.`;
 
       const aiRes = await aiService.chat(docId, prompt);
-      setAiAnalysis(aiRes.data?.answer || "AI could not generate a plan at this time.");
+
+      // aiService.chat returns response.data from axios, which has { success, data: { answer } }
+      setAiAnalysis(aiRes?.data?.answer || aiRes?.answer || "AI could not generate a plan at this time.");
 
     } catch (error) {
       console.error("AI Analysis failed:", error);

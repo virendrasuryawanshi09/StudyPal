@@ -1,0 +1,28 @@
+[2026-03-01T15:40:48.608Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:77:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:259:24)
+[2026-03-01T15:40:50.752Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:77:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:259:24)
+[2026-03-01T15:41:22.139Z] QUIZ ERROR: Error: models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+    at callGemini (file:///C:/StudyPal/backend/utils/geminiService.js:38:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async Module.generateQuiz (file:///C:/StudyPal/backend/utils/geminiService.js:137:23)
+    at async generateQuiz (file:///C:/StudyPal/backend/controllers/aiController.js:130:27)
+[2026-03-01T15:48:34.584Z] FLASHCARD ERROR: Error: models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+    at callGemini (file:///C:/StudyPal/backend/utils/geminiService.js:38:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async Module.generateFlashcards (file:///C:/StudyPal/backend/utils/geminiService.js:111:12)
+    at async generateFlashcards (file:///C:/StudyPal/backend/controllers/aiController.js:44:21)
+[2026-03-01T15:52:55.047Z] FLASHCARD ERROR: Error: models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+    at callGemini (file:///C:/StudyPal/backend/utils/geminiService.js:38:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async Module.generateFlashcards (file:///C:/StudyPal/backend/utils/geminiService.js:111:12)
+    at async generateFlashcards (file:///C:/StudyPal/backend/controllers/aiController.js:44:21)
+[2026-03-01T15:53:22.573Z] QUIZ ERROR: Error: models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+    at callGemini (file:///C:/StudyPal/backend/utils/geminiService.js:38:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async Module.generateQuiz (file:///C:/StudyPal/backend/utils/geminiService.js:137:23)
+    at async generateQuiz (file:///C:/StudyPal/backend/controllers/aiController.js:130:27)
