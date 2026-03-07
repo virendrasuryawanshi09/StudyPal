@@ -139,12 +139,24 @@ export const generateQuiz = async (req, res, next) => {
             });
         }
 
+        const normalizedQuestions = questions.map(q => {
+            const text = q.question || q.Question || q.text || q.q || "";
+            return {
+                ...q,
+                question: text.trim() ? text.trim() : "Question text missing (AI Generation Error)",
+                options: q.options || q.Options || [],
+                correctAnswer: q.correctAnswer || q.CorrectAnswer || q.answer || q.Answer || "",
+                explanation: q.explanation || q.Explanation || "",
+                difficulty: q.difficulty || "medium"
+            };
+        });
+
         const quiz = await Quiz.create({
             userId: req.user._id,
             documentId: document._id,
             title: title || `${document.title} - Quiz`,
-            questions,
-            totalQuestions: questions.length,
+            questions: normalizedQuestions,
+            totalQuestions: normalizedQuestions.length,
             userAnswers: [],
             score: 0,
         });

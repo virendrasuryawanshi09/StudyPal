@@ -110,8 +110,8 @@ const QuizResultPage = () => {
             <div
               key={idx}
               className={`p-6 md:p-8 rounded-2xl border transition-all ${result.isCorrect
-                  ? "bg-white dark:bg-[#181b22] border-slate-200 dark:border-slate-800"
-                  : "bg-white dark:bg-[#181b22] border-rose-100 dark:border-rose-900/30"
+                ? "bg-white dark:bg-[#181b22] border-slate-200 dark:border-slate-800"
+                : "bg-white dark:bg-[#181b22] border-rose-100 dark:border-rose-900/30"
                 }`}
             >
               <div className="flex flex-col md:flex-row gap-6">

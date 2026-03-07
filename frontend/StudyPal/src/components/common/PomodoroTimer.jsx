@@ -73,57 +73,57 @@ const PomodoroTimer = () => {
     };
 
     return (
-        <div className="bg-white dark:bg-[#181b22] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col items-center">
+            <div className="flex items-center justify-between w-full mb-6">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                     Pomodoro
                 </h3>
-                <div className="flex bg-slate-100 dark:bg-[#232734] p-1 rounded-lg">
+                <div className="flex bg-slate-50 border border-slate-200 p-1 rounded-xl">
                     <button
                         onClick={() => handleSwitchMode('study')}
-                        className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${mode === 'study' ? 'bg-white dark:bg-[#181b22] shadow-sm text-slate-900 dark:text-slate-100' : 'text-slate-500'}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${mode === 'study' ? 'bg-white shadow-sm text-indigo-600 border border-slate-200/50' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Study
                     </button>
                     <button
                         onClick={() => handleSwitchMode('break')}
-                        className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${mode === 'break' ? 'bg-white dark:bg-[#181b22] shadow-sm text-slate-900 dark:text-slate-100' : 'text-slate-500'}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${mode === 'break' ? 'bg-white shadow-sm text-indigo-600 border border-slate-200/50' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Break
                     </button>
                 </div>
             </div>
 
-            <div className="flex flex-col items-center">
-                <div className="text-5xl font-mono font-bold text-slate-900 dark:text-slate-100 mb-8 tracking-tighter">
+            <div className="flex flex-col items-center w-full">
+                <div className="text-5xl md:text-6xl font-black font-mono text-slate-900 mb-8 tracking-tighter">
                     {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
                 </div>
 
                 <div className="flex gap-4 w-full">
                     <button
                         onClick={toggleTimer}
-                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${isActive
-                                ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20'
-                                : 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
+                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all shadow-sm ${isActive
+                            ? 'bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100'
+                            : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-md'
                             }`}
                     >
-                        {isActive ? <Pause size={18} /> : <Play size={18} />}
+                        {isActive ? <Pause size={18} /> : <Play size={18} fill="currentColor" />}
                         {isActive ? 'Pause' : 'Start'}
                     </button>
 
                     <button
                         onClick={resetTimer}
-                        className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#232734] text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors border border-slate-200 dark:border-slate-700"
+                        className="w-12 h-12 shrink-0 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all border border-slate-200"
                     >
                         <RotateCcw size={18} />
                     </button>
                 </div>
 
-                <div className="mt-6 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium bg-slate-50 dark:bg-[#1f2430] px-4 py-2 rounded-full border border-slate-100 dark:border-slate-800">
+                <div className="mt-6 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-slate-50 px-4 py-2 rounded-full border border-slate-200">
                     {mode === 'study' ? (
-                        <><BookOpen size={14} className="text-indigo-500" /> Focusing: 25 min sessions</>
+                        <><BookOpen size={12} className="text-indigo-500" /> Focusing: 25 min sessions</>
                     ) : (
-                        <><Coffee size={14} className="text-amber-500" /> Resting: 5 min relaxation</>
+                        <><Coffee size={12} className="text-amber-500" /> Resting: 5 min relaxation</>
                     )}
                 </div>
             </div>
