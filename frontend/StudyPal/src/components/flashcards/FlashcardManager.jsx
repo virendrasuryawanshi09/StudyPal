@@ -6,6 +6,8 @@ import {
   Trash2,
   ArrowLeft,
   Star,
+  Clock,
+  BookOpen
 } from "lucide-react";
 
 import toast from "react-hot-toast";
@@ -16,6 +18,7 @@ import aiService from "../../services/aiService";
 import Spinner from "../common/spinner";
 import Modal from "../common/Modal";
 import Button from "../common/Button";
+import Flashcard from "./Flashcard";
 
 const FlashcardManager = ({ documentId }) => {
   const [flashcardSets, setFlashcardSets] = useState([]);
@@ -159,44 +162,8 @@ const FlashcardManager = ({ documentId }) => {
           </div>
         </div>
 
-        {/* Card */}
-        <div className="relative group perspective-1000">
-          <div className="bg-white dark:bg-[#181b22] border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-12 md:p-20 shadow-2xl relative overflow-hidden flex flex-col items-center justify-center min-h-[400px] transition-all duration-500 hover:border-emerald-500/30">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[60px] rounded-full"></div>
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 blur-[60px] rounded-full"></div>
-
-            <button
-              type="button"
-              onClick={() => handleToggleStar(card._id)}
-              className="absolute top-8 right-8 p-3 rounded-2xl bg-slate-50 dark:bg-[#232734] border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-amber-500 transition-all active:scale-95"
-            >
-              <Star
-                size={24}
-                className={card.starred ? "text-amber-500 fill-amber-500" : ""}
-              />
-            </button>
-
-            <div className="w-full max-w-2xl text-center space-y-8">
-              <div className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-[0.2em] border border-emerald-500/20 mb-4">
-                Question
-              </div>
-              <h3 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-slate-50 leading-tight">
-                {card.question}
-              </h3>
-
-              <div className="w-16 h-1 bg-slate-100 dark:bg-slate-800 mx-auto rounded-full my-8"></div>
-
-              <div className="space-y-4">
-                <div className="inline-block px-4 py-1.5 rounded-full bg-blue-500/10 text-blue-500 text-[10px] font-black uppercase tracking-[0.2em] border border-blue-500/20 mb-2">
-                  Answer
-                </div>
-                <p className="text-lg md:text-xl font-medium text-slate-600 dark:text-slate-400 leading-relaxed italic">
-                  {card.answer}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Flashcard Component */}
+        <Flashcard card={card} onToggleStar={handleToggleStar} />
 
         {/* Navigation */}
         <div className="flex justify-center items-center gap-10">
@@ -266,38 +233,78 @@ const FlashcardManager = ({ documentId }) => {
                   <div
                     key={set._id}
                     onClick={() => handleSelectSet(set)}
-                    className="group bg-white dark:bg-[#181b22] border border-slate-200 dark:border-slate-800 rounded-[2rem] p-8 transition-all duration-300 hover:shadow-2xl hover:border-slate-300 dark:hover:border-slate-700 cursor-pointer flex flex-col h-full relative overflow-hidden"
+                    className="
+                      group cursor-pointer
+                      rounded-2xl p-5
+                      bg-white dark:bg-[#181b22]
+                      border border-slate-200/60 dark:border-slate-700/60
+                      hover:shadow-xl hover:-translate-y-0.5
+                      transition-all duration-200
+                      flex flex-col h-full
+                    "
                   >
-                    <div className="absolute top-0 left-0 w-2 h-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    {/* Header */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="
+                          w-11 h-11 rounded-xl
+                          bg-slate-100 dark:bg-[#232734]
+                          flex items-center justify-center min-w-[44px]
+                        ">
+                          <BookOpen className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+                        </div>
 
-                    <div className="flex justify-between items-start mb-10">
-                      <div className="p-3 rounded-2xl bg-slate-50 dark:bg-[#232734] text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700/50">
-                        <BookOpen size={20} />
+                        <div>
+                          <h3
+                            className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1"
+                            title={`Revision Pack #${flashcardSets.length - idx}`}
+                          >
+                            {`Revision Pack #${flashcardSets.length - idx}`}
+                          </h3>
+
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            {set.cards.length} Core Concepts
+                          </p>
+                        </div>
                       </div>
 
                       <button
                         type="button"
                         onClick={(e) => handleDeleteRequest(e, set)}
-                        className="p-2 text-slate-400 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
+                        className="
+                          text-slate-400 hover:text-red-600
+                          transition-colors
+                        "
                       >
                         <Trash2 size={18} />
                       </button>
                     </div>
 
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold text-slate-900 dark:text-slate-50 leading-tight">
-                        {`Revision Pack #${flashcardSets.length - idx}`}
-                      </h4>
-                      <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-2">
-                        {moment(set.createdAt).format("MMM D, YYYY")}
-                      </p>
+                    {/* Stats Badges */}
+                    <div className="flex flex-wrap items-center gap-3 mt-4">
+                      <div
+                        className="
+                          inline-flex items-center gap-2
+                          px-3 py-1 rounded-full text-xs font-medium
+                          bg-indigo-50 text-indigo-600
+                          dark:bg-indigo-500/15 dark:text-indigo-300
+                        "
+                      >
+                        <BookOpen size={14} />
+                        {set.cards.length} Flashcards
+                      </div>
                     </div>
 
-                    <div className="mt-8 pt-6 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between">
-                      <span className="text-xs font-black text-slate-500 dark:text-slate-400 tracking-tighter uppercase tracking-widest">
-                        {set.cards.length} Core Concepts
+                    {/* Footer */}
+                    <div className="
+                      flex items-center gap-1.5 mt-5
+                      text-xs text-slate-500 dark:text-slate-400
+                      mt-auto
+                    ">
+                      <Clock size={14} />
+                      <span>
+                        Created {moment(set.createdAt).fromNow()}
                       </span>
-                      <ChevronRight size={18} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
                     </div>
                   </div>
                 ))}
@@ -339,22 +346,5 @@ const FlashcardManager = ({ documentId }) => {
     </div>
   );
 };
-
-// Add missing icon
-const BookOpen = ({ size }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-  </svg>
-);
 
 export default FlashcardManager;

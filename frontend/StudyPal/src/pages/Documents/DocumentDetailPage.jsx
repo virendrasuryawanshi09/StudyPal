@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import documentService from '../../services/documentService';
 import Spinner from '../../components/common/spinner';
 import toast from 'react-hot-toast';
@@ -13,10 +13,11 @@ import QuizManager from '../../components/quizzes/QuizManager';
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
+  const location = useLocation();
 
   const [document, setDocument] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('content');
+  const [activeTab, setActiveTab] = useState(location.state?.view || 'content');
 
   /* ================= FETCH DOCUMENT ================= */
 

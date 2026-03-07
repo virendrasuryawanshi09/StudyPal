@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CopyPlus, Clock, ArrowRight, Layers, LayoutGrid, LayoutList } from "lucide-react";
+import { CopyPlus, Clock, ArrowRight, Layers, LayoutGrid, LayoutList, BookOpen } from "lucide-react";
 import toast from "react-hot-toast";
 import moment from "moment";
 import flashcardService from "../../services/flashcardService";
@@ -50,28 +50,7 @@ const FlashcardsListPage = () => {
           </p>
         </div>
 
-        {sets.length > 0 && (
-          <div className="flex bg-slate-100 dark:bg-[#181b22] p-1.5 rounded-xl self-start md:self-auto border border-slate-200/60 dark:border-slate-700">
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-lg transition-colors ${viewMode === "grid"
-                ? "bg-white dark:bg-[#232734] text-slate-900 dark:text-slate-100 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
-                }`}
-            >
-              <LayoutGrid size={18} />
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`p-2 rounded-lg transition-colors ${viewMode === "list"
-                ? "bg-white dark:bg-[#232734] text-slate-900 dark:text-slate-100 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
-                }`}
-            >
-              <LayoutList size={18} />
-            </button>
-          </div>
-        )}
+
       </div>
 
       {sets.length === 0 ? (
@@ -91,76 +70,81 @@ const FlashcardsListPage = () => {
           </Button>
         </div>
       ) : (
-        <div className={
-          viewMode === "grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-            : "flex flex-col space-y-4"
-        }>
-          {sets.map((set, index) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sets.map((set) => {
             const documentTitle = set.documentId?.title || "Unknown Document";
-            const isGrid = viewMode === "grid";
 
             return (
               <Link
                 key={set._id}
                 to={`/documents/${set.documentId?._id}`}
-                className={`group relative bg-white dark:bg-[#181b22] border border-slate-200/60 dark:border-slate-800 rounded-2xl transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600
-                  ${isGrid ? "p-6 flex flex-col h-full" : "p-4 flex items-center justify-between"}
-                `}
+                state={{ view: 'flashcards' }}
+                className="
+                  group cursor-pointer
+                  rounded-2xl p-5
+                  bg-white dark:bg-[#181b22]
+                  border border-slate-200/60 dark:border-slate-700/60
+                  hover:shadow-xl hover:-translate-y-0.5
+                  transition-all duration-200
+                  flex flex-col h-full
+                "
               >
-                <div className={`${isGrid ? "mb-auto" : "flex items-center gap-4"}`}>
-                  {!isGrid && (
-                    <div className="p-3 bg-slate-100 dark:bg-[#232734] text-slate-500 rounded-xl">
-                      <Layers size={20} />
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="
+                      w-11 h-11 rounded-xl
+                      bg-slate-100 dark:bg-[#232734]
+                      flex items-center justify-center min-w-[44px]
+                    ">
+                      <Layers className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                     </div>
-                  )}
 
-                  <div>
-                    {/* Status Badge */}
-                    <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-slate-100 dark:bg-[#232734] text-slate-600 dark:text-slate-300 text-xs font-semibold uppercase tracking-wider rounded border border-slate-200 dark:border-slate-700/50 mb-3">
-                      Ready
-                    </span>
+                    <div>
+                      <h3
+                        className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1"
+                        title={documentTitle}
+                      >
+                        {documentTitle}
+                      </h3>
 
-                    <h3 className={`font-semibold text-slate-800 dark:text-slate-100 leading-tight mb-2 group-hover:text-emerald-500 transition-colors ${isGrid ? 'text-lg mt-2' : 'text-md mb-1'}`}>
-                      {documentTitle}
-                    </h3>
-
-                    {/* Meta for Grid */}
-                    {isGrid && (
-                      <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-4">
-                        {set.cards.length} cards in set
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        {set.cards.length} cards in deck
                       </p>
-                    )}
+                    </div>
+                  </div>
 
-                    {/* Meta for List */}
-                    {!isGrid && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                        {set.cards.length} cards • Created {moment(set.createdAt).fromNow()}
-                      </p>
-                    )}
+                  <div className="text-slate-400 transition-colors ml-2">
+                    <ArrowRight size={18} />
                   </div>
                 </div>
 
-                {/* Footer for Grid Mode */}
-                {isGrid && (
-                  <div className="pt-4 mt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
-                      <Clock size={14} />
-                      {moment(set.createdAt).fromNow()}
-                    </div>
-
-                    <div className="text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-all duration-300">
-                      <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
-                    </div>
+                {/* Stats Badges */}
+                <div className="flex flex-wrap items-center gap-3 mt-4">
+                  <div
+                    className="
+                      inline-flex items-center gap-2
+                      px-3 py-1 rounded-full text-xs font-medium
+                      bg-indigo-50 text-indigo-600
+                      dark:bg-indigo-500/15 dark:text-indigo-300
+                    "
+                  >
+                    <BookOpen size={14} />
+                    {set.cards.length} Flashcards
                   </div>
-                )}
+                </div>
 
-                {/* Arrow for List Mode */}
-                {!isGrid && (
-                  <div className="text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-all duration-300">
-                    <ArrowRight size={18} className="transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                )}
+                {/* Footer */}
+                <div className="
+                  flex items-center gap-1.5 mt-5
+                  text-xs text-slate-500 dark:text-slate-400
+                  mt-auto
+                ">
+                  <Clock size={14} />
+                  <span>
+                    Created {moment(set.createdAt).fromNow()}
+                  </span>
+                </div>
               </Link>
             );
           })}

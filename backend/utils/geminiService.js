@@ -17,7 +17,7 @@ async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function callGemini(prompt, retries = 3) {
+async function callGemini(prompt, retries = 5) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const res = await fetch(
@@ -43,10 +43,10 @@ async function callGemini(prompt, retries = 3) {
         const message = data.error.message || "Gemini API Error";
         console.error(`GEMINI API ERROR (attempt ${attempt}/${retries}):`, status, message);
 
-        // Rate limit — wait and retry
+        // Rate limit — wait and retry (more aggressive backoff for 15 RPM limit)
         if ((status === "RESOURCE_EXHAUSTED" || res.status === 429) && attempt < retries) {
-          const waitMs = attempt * 3000; // 3s, 6s, 9s
-          console.log(`Rate limited. Retrying in ${waitMs}ms...`);
+          const waitMs = attempt * 5000 + Math.random() * 2000; // ~5-7s, 10-12s, 15-17s
+          console.log(`Rate limited. Retrying in ${Math.round(waitMs)}ms...`);
           await sleep(waitMs);
           continue;
         }
