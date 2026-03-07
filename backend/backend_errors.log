@@ -106,3 +106,43 @@
     at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:104:11)
     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
     at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:271:24)
+[2026-03-07T05:56:28.356Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:104:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:271:24)
+[2026-03-07T05:56:28.528Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:104:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:271:24)
+[2026-03-07T05:56:43.470Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:104:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:271:24)
+[2026-03-07T05:56:44.423Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:104:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:271:24)
+[2026-03-07T05:57:11.523Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:104:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:271:24)
+[2026-03-07T05:57:12.019Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:104:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:271:24)
+[2026-03-07T05:57:19.000Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:104:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:271:24)
+[2026-03-07T05:57:19.554Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:104:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:271:24)
+[2026-03-07T05:57:25.748Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:104:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:271:24)
+[2026-03-07T05:57:26.273Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/utils/geminiService.js:104:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:271:24)

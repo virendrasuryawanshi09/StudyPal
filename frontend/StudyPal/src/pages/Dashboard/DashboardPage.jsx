@@ -11,44 +11,69 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
 import {
-  FileText,
-  BookOpen,
-  BrainCircuit,
-  Clock,
-  Target,
-  Activity,
-  RefreshCw,
-  ChevronRight,
-  Layers,
-  Sparkles,
-  TrendingUp,
-  TrendingDown,
-  CheckCircle2,
-  ListTodo,
-  Lightbulb,
-  Upload,
-  BarChart3,
-  CalendarDays,
-  CalendarRange,
-  Calendar
+  FileText, BookOpen, BrainCircuit, Clock, Target, Activity, RefreshCw,
+  ChevronRight, Layers, Sparkles, TrendingUp, TrendingDown, CheckCircle2,
+  ListTodo, Lightbulb, Upload, BarChart3, CalendarDays, CalendarRange,
+  Calendar, Play, Pause, RotateCcw
 } from "lucide-react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from "recharts";
 import ReactMarkdown from "react-markdown";
+
+// --- INLINE POMODORO COMPONENT ---
+// Rebuilt specifically for the Dashboard Header to fit the Premium Minimalist aesthetic
+const DashboardPomodoro = () => {
+  const [minutes, setMinutes] = useState(25);
+  const [seconds, setSeconds] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    let interval = null;
+    if (isActive) {
+      interval = setInterval(() => {
+        if (seconds > 0) setSeconds(seconds - 1);
+        else if (minutes > 0) { setMinutes(minutes - 1); setSeconds(59); }
+        else { setIsActive(false); clearInterval(interval); toast.success("Focus Session Complete!"); }
+      }, 1000);
+    } else if (!isActive && seconds !== 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isActive, seconds, minutes]);
+
+  const toggle = () => setIsActive(!isActive);
+  const reset = () => { setIsActive(false); setMinutes(25); setSeconds(0); };
+
+  return (
+    <div className="bg-white border border-slate-200 rounded-[12px] p-2 flex items-center gap-3 shadow-sm hover:shadow-md transition-all h-full">
+      <div className="bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg flex items-center gap-2">
+        <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-amber-500 animate-pulse' : 'bg-slate-300'}`}></div>
+        <span className="font-mono font-bold text-slate-800 tracking-tight text-sm">
+          {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+        </span>
+      </div>
+      <div className="flex items-center gap-1 pr-1">
+        <button onClick={toggle} className={`p-1.5 rounded-md transition-colors ${isActive ? 'bg-amber-100 text-amber-700' : 'hover:bg-indigo-50 text-indigo-600'}`}>
+          {isActive ? <Pause size={14} fill="currentColor" /> : <Play size={14} fill="currentColor" />}
+        </button>
+        <button onClick={reset} className="p-1.5 rounded-md hover:bg-slate-100 text-slate-400 transition-colors">
+          <RotateCcw size={14} />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const DashboardPage = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [aiAnalysis, setAiAnalysis] = useState("");
   const [generatingAi, setGeneratingAi] = useState(false);
+
+  // Local state for checkboxes
+  const [checkedTasks, setCheckedTasks] = useState(new Set());
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -90,19 +115,18 @@ const DashboardPage = () => {
       setAiAnalysis(aiRes?.data?.answer || aiRes?.answer);
     } catch (error) {
       console.error("AI Analysis failed. Using fallback:", error);
-      // Premium Fallback Logic if Gemini API fails
-      const insights = currentData?.analytics?.learningInsights;
-      const fallbackStr = `**AI Systems Offline** 
-      
-However, based on your analytics:
-- Your strongest area is **${insights?.bestSubject || 'N/A'}**.
-- You need attention on **${insights?.weakestSubject || 'N/A'}**.
-
-*Recommendation: ${insights?.recommendation || 'Try reviewing flashcards before attempting another quiz.'}*`;
-      setAiAnalysis(fallbackStr);
+      // We use the new Interactive UI fallback now, so we don't need a massive string here.
+      setAiAnalysis("");
     } finally {
       setGeneratingAi(false);
     }
+  };
+
+  const toggleTask = (index) => {
+    const newSet = new Set(checkedTasks);
+    if (newSet.has(index)) newSet.delete(index);
+    else newSet.add(index);
+    setCheckedTasks(newSet);
   };
 
   if (loading) {
@@ -116,10 +140,10 @@ However, based on your analytics:
     );
   }
 
-  const { overview, recentActivity, analytics } = dashboardData || {};
+  const { overview, analytics } = dashboardData || {};
 
   // --- Premium Styling Constants ---
-  const CARD_STYLE = "bg-white border border-slate-200 rounded-[16px] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-0.5";
+  const CARD_STYLE = "bg-white border border-slate-200 rounded-[16px] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1";
 
   // --- Mapped Data ---
   const stats = [
@@ -129,41 +153,18 @@ However, based on your analytics:
     { label: "Accuracy", value: `${overview?.averageScore || 0}%`, icon: Target, trend: "Overall avg", color: "text-rose-600", bg: "bg-rose-50 border-rose-100" }
   ];
 
-  const activities = [
-    ...(recentActivity?.documents || []).map((doc) => ({
-      id: doc._id || Math.random(),
-      title: doc.title,
-      time: doc.lastAccessed || doc.createdAt,
-      link: `/documents/${doc._id}`,
-      type: "Document Edited",
-      icon: FileText
-    })),
-    ...(recentActivity?.quizzes || []).map((quiz) => ({
-      id: quiz._id || Math.random(),
-      title: quiz.title || 'Quiz',
-      time: quiz.completedAt || quiz.createdAt,
-      link: `/quizzes/${quiz._id}`,
-      type: "Quiz Taken",
-      icon: CheckCircle2,
-      score: quiz.score
-    })),
-  ].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 5);
-
   const chartData = (analytics?.recentPerformanceData || []).length > 0
     ? analytics.recentPerformanceData.map((q, i) => ({
-      name: `Q${i + 1}`,
-      fullName: q.title,
-      date: new Date(q.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-      score: q.score
+      name: `Q${i + 1}`, fullName: q.title, date: new Date(q.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), score: q.score
     }))
     : [{ name: "No Data", score: 0 }];
 
-  // Circular Progress Data (Calculated dynamically to look realistic based on overall points/score)
+  // Circular Progress Data
   const dailyProg = Math.min(100, Math.max(10, (overview?.pointsLevel || 1) * 15 + (overview?.studyStreak || 0) * 5));
   const weeklyProg = Math.min(100, Math.max(20, (overview?.completedQuizzes || 0) * 10));
   const monthlyProg = Math.min(100, overview?.averageScore || 50);
 
-  // --- Components ---
+  // Components
   const CardHeader = ({ icon: Icon, title, subtitle, action }) => (
     <div className="flex items-start justify-between mb-6">
       <div className="flex items-center gap-3">
@@ -180,11 +181,11 @@ However, based on your analytics:
   );
 
   return (
-    <div className="min-h-screen bg-slate-50/50 text-slate-800 p-4 md:p-6 lg:p-8 font-sans">
-      <div className="max-w-[1500px] mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-50/50 text-slate-800 p-4 md:p-6 lg:p-8 font-sans overflow-x-hidden">
+      <div className="max-w-[1500px] mx-auto space-y-8 pb-12">
 
-        {/* --- 1. HEADER & QUICK ACTIONS --- */}
-        <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
+        {/* --- HEADER --- */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="space-y-1">
             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
               Dashboard
@@ -193,18 +194,18 @@ However, based on your analytics:
             <p className="text-slate-500 text-sm font-medium">Welcome back. Manage your study materials and track your progress.</p>
           </div>
 
-          <div className="flex gap-3 overflow-x-auto pb-2 w-full lg:w-auto hide-scrollbar">
-            <button onClick={() => navigate('/documents')} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 shadow-sm hover:shadow-md transition-all rounded-[12px] text-sm font-bold text-slate-700 whitespace-nowrap">
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 w-full lg:w-auto hide-scrollbar self-stretch">
+            <DashboardPomodoro />
+            <button onClick={() => navigate('/documents')} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 shadow-sm hover:shadow-md transition-all rounded-[12px] text-sm font-bold text-slate-700 whitespace-nowrap h-full">
               <Upload size={16} /> Upload Notes
             </button>
-            {/* Fix: Redirect to documents so they can select one to build a quiz from */}
-            <button onClick={() => navigate('/documents')} className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 border border-indigo-700 hover:bg-indigo-700 shadow-sm hover:shadow-md transition-all rounded-[12px] text-sm font-bold text-white whitespace-nowrap">
+            <button onClick={() => navigate('/documents')} className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 border border-indigo-700 hover:bg-indigo-700 shadow-sm hover:shadow-md transition-all rounded-[12px] text-sm font-bold text-white whitespace-nowrap h-full">
               <BrainCircuit size={16} /> Create Quiz
             </button>
           </div>
         </div>
 
-        {/* --- 2. STATS ROW --- */}
+        {/* --- STATS ROW --- */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {stats.map((stat, i) => (
             <div key={i} className={CARD_STYLE + " group !p-5"}>
@@ -218,77 +219,34 @@ However, based on your analytics:
                 <div className="flex items-end gap-2">
                   <p className="text-3xl font-black tracking-tight text-slate-900">{stat.value}</p>
                 </div>
-                <p className="text-xs font-semibold text-slate-400 mt-2 flex items-center gap-1">
-                  <TrendingUp size={12} className={stat.color} /> {stat.trend}
-                </p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* --- 3. MAIN GRID (Overview & Focus) --- */}
+        {/* --- ROW 1: Progress & Focus --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
           {/* Progress Overview (Col 8) */}
-          <div className={`lg:col-span-8 ${CARD_STYLE}`}>
+          <div className={`lg:col-span-8 flex flex-col justify-between ${CARD_STYLE}`}>
             <CardHeader icon={BarChart3} title="Progress Overview" subtitle="Your learning trajectory and time invested" />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6 mt-4">
-              {/* Circular Progress 1 */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-4">
               <div className="flex flex-col items-center">
                 <div className="w-28 h-28 mb-4">
-                  <CircularProgressbar
-                    value={dailyProg}
-                    text={`${dailyProg}%`}
-                    styles={buildStyles({
-                      pathColor: '#6366f1', // indigo-500
-                      textColor: '#0f172a', // slate-900
-                      trailColor: '#f1f5f9', // slate-100
-                      textSize: '22px',
-                      pathTransitionDuration: 1.5
-                    })}
-                  />
+                  <CircularProgressbar value={dailyProg} text={`${dailyProg}%`} styles={buildStyles({ pathColor: '#6366f1', textColor: '#0f172a', trailColor: '#f1f5f9', textSize: '22px', pathTransitionDuration: 1.5 })} />
                 </div>
                 <p className="text-sm font-bold text-slate-800 flex items-center gap-2"><CalendarDays size={14} className="text-slate-400" /> Daily Goal</p>
-                <p className="text-xs text-slate-500 font-medium mt-1">{overview?.dailyTasksCompleted || 1} tasks today</p>
               </div>
-
-              {/* Circular Progress 2 */}
               <div className="flex flex-col items-center">
                 <div className="w-28 h-28 mb-4">
-                  <CircularProgressbar
-                    value={weeklyProg}
-                    text={`${weeklyProg}%`}
-                    styles={buildStyles({
-                      pathColor: '#10b981', // emerald-500
-                      textColor: '#0f172a', // slate-900
-                      trailColor: '#f1f5f9', // slate-100
-                      textSize: '22px',
-                      pathTransitionDuration: 1.5
-                    })}
-                  />
+                  <CircularProgressbar value={weeklyProg} text={`${weeklyProg}%`} styles={buildStyles({ pathColor: '#10b981', textColor: '#0f172a', trailColor: '#f1f5f9', textSize: '22px', pathTransitionDuration: 1.5 })} />
                 </div>
                 <p className="text-sm font-bold text-slate-800 flex items-center gap-2"><CalendarRange size={14} className="text-slate-400" /> Weekly Progress</p>
-                <p className="text-xs text-slate-500 font-medium mt-1">{overview?.totalStudyTimeHours || 0} hrs studied</p>
               </div>
-
-              {/* Circular Progress 3 */}
               <div className="flex flex-col items-center">
                 <div className="w-28 h-28 mb-4">
-                  <CircularProgressbar
-                    value={monthlyProg}
-                    text={`${monthlyProg}%`}
-                    styles={buildStyles({
-                      pathColor: '#f59e0b', // amber-500
-                      textColor: '#0f172a', // slate-900
-                      trailColor: '#f1f5f9', // slate-100
-                      textSize: '22px',
-                      pathTransitionDuration: 1.5
-                    })}
-                  />
+                  <CircularProgressbar value={monthlyProg} text={`${monthlyProg}%`} styles={buildStyles({ pathColor: '#f59e0b', textColor: '#0f172a', trailColor: '#f1f5f9', textSize: '22px', pathTransitionDuration: 1.5 })} />
                 </div>
                 <p className="text-sm font-bold text-slate-800 flex items-center gap-2"><Calendar size={14} className="text-slate-400" /> Monthly Mastery</p>
-                <p className="text-xs text-slate-500 font-medium mt-1">{overview?.completedQuizzes || 0} quizzes passed</p>
               </div>
             </div>
           </div>
@@ -296,58 +254,48 @@ However, based on your analytics:
           {/* Today's Focus (Col 4) */}
           <div className={`lg:col-span-4 ${CARD_STYLE}`}>
             <CardHeader icon={ListTodo} title="Today's Focus" subtitle="Actionable tasks generated for you" />
-
             <div className="space-y-3">
               {(analytics?.todaysFocus || []).map((task, i) => (
-                <Link key={i} to={task.actionUrl} className="group flex items-start gap-4 p-4 rounded-[12px] bg-slate-50 hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm transition-all duration-300">
-                  <div className={`mt-0.5 w-5 h-5 rounded-full border-[2.5px] flex items-center justify-center shrink-0 ${task.priority === 'High' ? 'border-amber-400 bg-amber-50 group-hover:bg-amber-100' : 'border-indigo-400 bg-indigo-50 group-hover:bg-indigo-100'}`}>
-                    <div className={`w-2 h-2 rounded-full ${task.priority === 'High' ? 'bg-amber-500' : 'bg-indigo-500'} opacity-0 group-hover:opacity-100 transition-opacity`}></div>
+                <Link key={i} to={task.actionUrl} className="group flex items-start gap-3 p-3.5 rounded-[12px] bg-slate-50 hover:bg-white border border-slate-100 hover:border-indigo-200 transition-all duration-300 hover:shadow-sm">
+                  <div className={`mt-0.5 w-4 h-4 rounded-full border-[2px] flex items-center justify-center shrink-0 ${task.priority === 'High' ? 'border-amber-400 bg-amber-50 group-hover:bg-amber-100' : 'border-indigo-400 bg-indigo-50 group-hover:bg-indigo-100'}`}>
+                    <div className={`w-1.5 h-1.5 rounded-full ${task.priority === 'High' ? 'bg-amber-500' : 'bg-indigo-500'} opacity-0 group-hover:opacity-100 transition-opacity`}></div>
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors leading-tight mb-1">{task.title}</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{task.type}</p>
+                    <p className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors leading-tight">{task.title}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{task.type}</p>
                   </div>
                 </Link>
               ))}
               {(!analytics?.todaysFocus || analytics.todaysFocus.length === 0) && (
-                <div className="text-center py-6 text-slate-400 text-sm">No specific tasks generated for today.</div>
+                <div className="text-center py-6 text-slate-400 text-sm font-medium">Upload notes or generate flashcards to create study tasks.</div>
               )}
             </div>
           </div>
-
         </div>
 
-        {/* --- 4. ANALYTICS SECTION --- */}
+        {/* --- ROW 2: Analytics & Heatmap --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
           {/* Performance Analytics */}
           <div className={`lg:col-span-8 ${CARD_STYLE}`}>
             <CardHeader icon={Activity} title="Performance Analytics" subtitle="Quiz accuracy trends over recent sessions" />
-
-            <div className="h-[280px] w-full mt-4">
+            <div className="h-[250px] w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barSize={36}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.8} />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} dy={10} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(val) => `${val}%`} />
-                  <Tooltip
-                    cursor={{ fill: '#f8fafc', opacity: 0.8 }}
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const data = payload[0].payload;
-                        return (
-                          <div className="bg-white border border-slate-200 shadow-[0_10px_30px_rgba(0,0,0,0.1)] rounded-[12px] p-4">
-                            <p className="text-sm font-bold text-slate-900 mb-1">{data.fullName}</p>
-                            <p className="text-xs uppercase text-slate-500 mb-3 font-semibold">{data.date}</p>
-                            <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                              <div className={`w-2.5 h-2.5 rounded-full ${data.score >= 80 ? 'bg-emerald-500' : data.score >= 50 ? 'bg-indigo-500' : 'bg-rose-500'}`}></div>
-                              <span className="text-[11px] font-black tracking-wider text-slate-700">{data.score}% ACCURACY</span>
-                            </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
+                  <Tooltip cursor={{ fill: '#f8fafc', opacity: 0.8 }} content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-white border border-slate-200 shadow-[0_10px_30px_rgba(0,0,0,0.1)] rounded-[12px] p-4 text-center">
+                          <p className="text-sm font-bold text-slate-900">{data.fullName}</p>
+                          <p className="text-[24px] font-black text-indigo-600 mt-1">{data.score}%</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
                   />
                   <Bar dataKey="score" radius={[6, 6, 0, 0]}>
                     {chartData.map((entry, index) => (
@@ -359,122 +307,134 @@ However, based on your analytics:
             </div>
           </div>
 
-          {/* Recent Activity Timeline */}
+          {/* Weekly Learning Heatmap */}
           <div className={`lg:col-span-4 ${CARD_STYLE}`}>
-            <CardHeader icon={Clock} title="Recent Activity" action={<Link to="/documents" className="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg">View All</Link>} />
-
-            <div className="relative pl-3 mt-4">
-              {/* Continuous Line */}
-              <div className="absolute left-[23px] top-3 bottom-6 w-[2px] bg-slate-100"></div>
-
-              <div className="space-y-6 relative">
-                {activities.length > 0 ? activities.map((activity, i) => (
-                  <div key={activity.id + i} className="flex gap-5 group">
-                    <div className="relative z-10 w-10 h-10 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center shrink-0 shadow-sm text-slate-500 group-hover:bg-indigo-100 group-hover:text-indigo-600 group-hover:scale-110 transition-all duration-300">
-                      <activity.icon size={16} strokeWidth={2.5} />
-                    </div>
-                    <div className="flex-1 pt-1.5 pb-2">
-                      <Link to={activity.link} className="text-sm font-bold text-slate-800 hover:text-indigo-600 transition-colors block leading-tight">
-                        {activity.title}
-                      </Link>
-                      <div className="flex items-center gap-2 mt-2">
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{activity.type}</p>
-                        <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                        <p className="text-xs font-medium text-slate-400">{new Date(activity.time).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>
-                      </div>
-                    </div>
-                  </div>
-                )) : (
-                  <div className="text-center py-6 text-slate-400 text-sm">No recent activity found.</div>
-                )}
-              </div>
+            <CardHeader icon={Calendar} title="Weekly Activity" subtitle="Study events across the week" />
+            <div className="h-[250px] w-full mt-4 bg-slate-50/50 rounded-xl p-2 border border-slate-100">
+              {analytics?.weeklyActivity?.reduce((sum, item) => sum + item.activity, 0) > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics?.weeklyActivity} layout="vertical" margin={{ top: 0, right: 10, left: -15, bottom: 0 }} barSize={16}>
+                    <XAxis type="number" hide />
+                    <YAxis dataKey="day" type="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 11, fontWeight: 700 }} />
+                    <Tooltip cursor={{ fill: 'transparent' }} content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return <div className="bg-slate-900 text-white text-xs font-bold py-1 px-2 rounded-md">{payload[0].value} events</div>;
+                      } return null;
+                    }}
+                    />
+                    <Bar dataKey="activity" radius={[0, 4, 4, 0]}>
+                      {(analytics?.weeklyActivity || []).map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.activity > 0 ? '#6366f1' : '#e2e8f0'} className="hover:opacity-80 cursor-pointer" />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-slate-400 text-sm font-medium text-center px-4">
+                  Start studying to populate your learning heatmap.
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* --- 5. INSIGHTS SECTION --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-12">
+        {/* --- ROW 3: Knowledge Mastery Score --- */}
+        <div className={CARD_STYLE}>
+          <CardHeader icon={Target} title="Knowledge Mastery" subtitle="Your average accuracy per subject area" />
 
-          {/* Learning Insights Card */}
-          <div className="bg-gradient-to-br from-indigo-900 to-slate-900 border border-slate-800 rounded-[16px] p-6 md:p-8 shadow-[0_10px_30px_rgba(0,0,0,0.15)] text-white relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-
-            <div className="relative z-10">
-              <div className="flex items-start justify-between mb-8">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-white/10 rounded-xl text-indigo-300 backdrop-blur-sm border border-white/5">
-                    <Lightbulb size={20} strokeWidth={2.5} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {(analytics?.knowledgeMastery || []).length > 0 ? (
+              analytics.knowledgeMastery.map((item, idx) => (
+                <div key={idx} className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+                  <div className="flex justify-between items-center mb-3">
+                    <p className="text-sm font-bold text-slate-800 truncate pr-4">{item.subject}</p>
+                    <p className={`text-sm font-black ${item.accuracy >= 80 ? 'text-emerald-600' : item.accuracy >= 50 ? 'text-indigo-600' : 'text-rose-600'}`}>{item.accuracy}%</p>
                   </div>
-                  <div>
-                    <h2 className="text-base font-bold text-white tracking-tight">Learning Insights</h2>
-                    <p className="text-xs font-medium text-indigo-200 mt-0.5">Systematic analysis of your statistics</p>
+                  <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-1000 ease-out ${item.accuracy >= 80 ? 'bg-emerald-500' : item.accuracy >= 50 ? 'bg-indigo-500' : 'bg-rose-500'}`}
+                      style={{ width: `${item.accuracy}%` }}
+                    ></div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="col-span-full py-8 text-center text-slate-400 text-sm font-medium">
+                Take quizzes to see your subject mastery.
               </div>
+            )}
+          </div>
+        </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                <div className="bg-white/5 border border-white/10 p-5 rounded-[12px] backdrop-blur-sm hover:bg-white/10 transition-colors">
-                  <div className="flex items-center gap-2 mb-3">
-                    <TrendingUp size={16} className="text-emerald-400" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-indigo-200">Strongest Subject</p>
+        {/* --- ROW 4: AI Study Plan & Copilot --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          {/* AI Study Plan */}
+          <div className={`${CARD_STYLE} flex flex-col`}>
+            <CardHeader icon={ListTodo} title="AI Study Plan" subtitle="Personalized daily roadmap" />
+
+            <div className="flex-1 space-y-3 mt-2">
+              {/* Map existing todaysFocus into a checklist format */}
+              {(analytics?.todaysFocus || []).map((task, i) => (
+                <div key={i} className="flex items-center gap-4 bg-slate-50 border border-slate-100 p-4 rounded-[12px] hover:border-indigo-200 transition-colors group">
+                  <button
+                    onClick={() => toggleTask(i)}
+                    className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 transition-colors ${checkedTasks.has(i) ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-300 group-hover:border-indigo-400 bg-white'}`}
+                  >
+                    {checkedTasks.has(i) && <CheckCircle2 size={12} strokeWidth={4} />}
+                  </button>
+                  <div className="flex-1">
+                    <p className={`text-sm font-bold transition-colors ${checkedTasks.has(i) ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{task.title}</p>
                   </div>
-                  <p className="text-xl font-black text-white leading-tight">{analytics?.learningInsights?.bestSubject || "N/A"}</p>
+                  <Link to={task.actionUrl} className="px-3 py-1.5 bg-white border border-slate-200 text-xs font-bold text-indigo-600 rounded-lg shadow-sm hover:shadow-md hover:bg-indigo-50 transition-all opacity-0 group-hover:opacity-100">Go</Link>
                 </div>
-
-                <div className="bg-white/5 border border-white/10 p-5 rounded-[12px] backdrop-blur-sm hover:bg-white/10 transition-colors">
-                  <div className="flex items-center gap-2 mb-3">
-                    <TrendingDown size={16} className="text-rose-400" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-indigo-200">Needs Attention</p>
-                  </div>
-                  <p className="text-xl font-black text-white leading-tight">{analytics?.learningInsights?.weakestSubject || "N/A"}</p>
-                </div>
-              </div>
-
-              <div className="mt-4 bg-white/10 p-5 rounded-[12px] border border-white/20 backdrop-blur-md flex gap-4 items-start">
-                <div className="shrink-0 mt-1">
-                  <Sparkles size={20} className="text-amber-400" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-widest text-indigo-200 mb-1">Recommendation</p>
-                  <p className="text-sm font-medium text-white leading-relaxed">{analytics?.learningInsights?.recommendation}</p>
-                </div>
-              </div>
+              ))}
+              {(!analytics?.todaysFocus || analytics.todaysFocus.length === 0) && (
+                <div className="py-10 text-center text-slate-400 text-sm font-medium">Upload notes to generate a study plan.</div>
+              )}
             </div>
           </div>
 
-          {/* AI Copilot Panel */}
-          <div className="bg-white border border-slate-200 rounded-[16px] shadow-[0_10px_30px_rgba(0,0,0,0.03)] flex flex-col h-[400px] overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
-            <div className="p-5 border-b border-indigo-100 bg-indigo-50/50 flex justify-between items-center">
-              <div className="flex items-center gap-3 text-indigo-700">
-                <div className="p-2 bg-indigo-100 rounded-lg">
+          {/* Interactive AI Copilot */}
+          <div className="bg-gradient-to-br from-indigo-900 to-slate-900 border border-slate-800 rounded-[16px] shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col h-[400px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.2)]">
+            <div className="p-5 border-b border-white/10 bg-white/5 flex justify-between items-center backdrop-blur-sm">
+              <div className="flex items-center gap-3 text-indigo-300">
+                <div className="p-2 bg-white/10 rounded-lg border border-white/5">
                   <Sparkles size={16} fill="currentColor" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-bold tracking-tight">AI Copilot</h2>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mt-0.5">Gemini Powered</p>
+                  <h2 className="text-sm font-bold tracking-tight text-white">AI Copilot</h2>
+                  <p className="text-[10px] font-black uppercase tracking-widest mt-0.5">Interactive Guide</p>
                 </div>
               </div>
-              <button onClick={() => handleAiAnalysis(dashboardData)} disabled={generatingAi} className="p-2 rounded-lg hover:bg-white border border-transparent hover:border-slate-200 text-slate-500 shadow-sm transition-all disabled:opacity-50">
-                {generatingAi ? <Spinner /> : <RefreshCw size={14} />}
-              </button>
             </div>
 
-            <div className="flex-1 relative bg-white p-6 overflow-y-auto custom-scrollbar">
-              {generatingAi ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white/90 backdrop-blur-sm z-10">
-                  <div className="pulse-dot w-4 h-4 bg-indigo-500 rounded-full animate-ping"></div>
-                  <p className="text-xs font-black uppercase tracking-widest text-indigo-600">Generating insights...</p>
+            <div className="flex-1 p-6 flex flex-col">
+              {/* Interactive UI based on analytics fallback instead of pure string */}
+              <div className="bg-white/5 border border-white/10 p-5 rounded-[12px] backdrop-blur-sm mb-6">
+                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-300 mb-2">Recommendation</p>
+                <p className="text-white font-bold text-lg leading-tight">
+                  {analytics?.learningInsights?.weakestSubject && analytics.learningInsights.weakestSubject !== "N/A"
+                    ? `Your weakest subject is ${analytics.learningInsights.weakestSubject}.`
+                    : "Keep taking quizzes to unlock specific recommendations."
+                  }
+                </p>
+                <div className="mt-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg flex gap-3">
+                  <TrendingDown size={18} className="text-rose-400 shrink-0" />
+                  <p className="text-sm text-indigo-100/80">
+                    {analytics?.learningInsights?.recommendation || "Complete more tasks to build your learning profile."}
+                  </p>
                 </div>
-              ) : (
-                <div className="prose prose-sm prose-slate max-w-none 
-                        prose-p:text-slate-600 prose-p:leading-relaxed 
-                        prose-headings:text-slate-900 prose-headings:font-bold prose-headings:tracking-tight
-                        prose-strong:text-slate-900
-                        prose-li:text-slate-600
-                        prose-a:text-indigo-600">
-                  {aiAnalysis ? <ReactMarkdown>{aiAnalysis}</ReactMarkdown> : <p className="text-center text-slate-400 mt-10 font-medium">Select a document to get AI insights.</p>}
+              </div>
+
+              <div className="mt-auto">
+                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-300 mb-3">Suggested Actions</p>
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={() => navigate('/quizzes')} className="px-4 py-2 bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold rounded-lg shadow-lg border border-indigo-400 transition-colors">Start Quiz</button>
+                  <button onClick={() => navigate('/flashcards')} className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-lg border border-white/10 transition-colors">Review Flashcards</button>
+                  <button onClick={() => navigate('/documents')} className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-lg border border-white/10 transition-colors">Study Notes</button>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
