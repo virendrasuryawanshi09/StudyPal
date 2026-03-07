@@ -73,19 +73,6 @@ export const reviewFlashcard = async (req, res, next) => {
         const user = await User.findById(req.user._id);
         if (user) {
             user.points = (user.points || 0) + 5;
-            const today = moment().startOf('day');
-            if (user.lastStudyDate) {
-                const lastDate = moment(user.lastStudyDate).startOf('day');
-                const diff = today.diff(lastDate, 'days');
-                if (diff === 1) {
-                    user.studyStreak += 1;
-                } else if (diff > 1) {
-                    user.studyStreak = 1;
-                }
-            } else {
-                user.studyStreak = 1;
-            }
-            user.lastStudyDate = today.toDate();
             user.pointsLevel = Math.floor(user.points / 100) + 1;
             await user.save();
         }

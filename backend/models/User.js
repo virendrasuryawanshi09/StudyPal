@@ -37,14 +37,6 @@ const userSchema = new mongoose.Schema({
     pointsLevel: {
         type: Number,
         default: 1,
-    },
-    lastStudyDate: {
-        type: Date,
-        default: null,
-    },
-    studyStreak: {
-        type: Number,
-        default: 0,
     }
 }, {
     timestamps: true,

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CopyPlus, Clock, ArrowRight, Layers, LayoutGrid, LayoutList } from "lucide-react";
 import toast from "react-hot-toast";
 import moment from "moment";
 import flashcardService from "../../services/flashcardService";
 import Spinner from "../../components/common/spinner";
+import Button from "../../components/common/Button";
 
 const FlashcardsListPage = () => {
+  const navigate = useNavigate();
   const [sets, setSets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState("grid");
@@ -53,8 +55,8 @@ const FlashcardsListPage = () => {
             <button
               onClick={() => setViewMode("grid")}
               className={`p-2 rounded-lg transition-colors ${viewMode === "grid"
-                  ? "bg-white dark:bg-[#232734] text-slate-900 dark:text-slate-100 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+                ? "bg-white dark:bg-[#232734] text-slate-900 dark:text-slate-100 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
                 }`}
             >
               <LayoutGrid size={18} />
@@ -62,8 +64,8 @@ const FlashcardsListPage = () => {
             <button
               onClick={() => setViewMode("list")}
               className={`p-2 rounded-lg transition-colors ${viewMode === "list"
-                  ? "bg-white dark:bg-[#232734] text-slate-900 dark:text-slate-100 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+                ? "bg-white dark:bg-[#232734] text-slate-900 dark:text-slate-100 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
                 }`}
             >
               <LayoutList size={18} />
@@ -81,12 +83,12 @@ const FlashcardsListPage = () => {
           <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md text-center mb-6">
             Upload a document and let our AI generate a complete study deck for you instantly.
           </p>
-          <Link
-            to="/documents"
-            className="px-6 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold rounded-xl transition-colors hover:opacity-90 flex items-center gap-2"
+          <Button
+            size="lg"
+            onClick={() => navigate('/documents')}
           >
             Go to Documents <ArrowRight size={18} />
-          </Link>
+          </Button>
         </div>
       ) : (
         <div className={

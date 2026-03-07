@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Spinner from "../../components/common/spinner";
+import Button from "../../components/common/Button";
 import progressService from "../../services/progressSevice.js";
 import documentService from "../../services/documentService.js";
 import aiService from "../../services/aiService.js";
@@ -17,7 +18,7 @@ import {
   Calendar, Play, Pause, RotateCcw
 } from "lucide-react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
+  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from "recharts";
 import ReactMarkdown from "react-markdown";
 
@@ -68,8 +69,6 @@ const DashboardPomodoro = () => {
 const DashboardPage = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [aiAnalysis, setAiAnalysis] = useState("");
-  const [generatingAi, setGeneratingAi] = useState(false);
 
   // Local state for checkboxes
   const [checkedTasks, setCheckedTasks] = useState(new Set());
@@ -77,50 +76,31 @@ const DashboardPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    let intervalId;
+
+    const fetchDashboardData = async (silent = false) => {
       try {
+        if (!silent) setLoading(true);
         const res = await progressService.getDashboardData();
         setDashboardData(res.data);
-        if (res.data?.overview?.totalDocuments > 0) {
-          handleAiAnalysis(res.data);
-        } else {
-          setAiAnalysis("Upload some documents first so StudyPal AI can analyze your materials and provide personalized guidance.");
-        }
       } catch (error) {
-        toast.error("Failed to fetch dashboard data.");
+        if (!silent) toast.error("Failed to fetch dashboard data.");
         console.error(error);
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
       }
     };
-    fetchDashboardData();
+
+    // Initial fetch with Loading Spinner
+    fetchDashboardData(false);
+
+    // Set up silent background polling every 10 seconds
+    intervalId = setInterval(() => {
+      fetchDashboardData(true);
+    }, 10000);
+
+    return () => clearInterval(intervalId);
   }, []);
-
-  const handleAiAnalysis = async (currentData) => {
-    try {
-      setGeneratingAi(true);
-      const docs = await documentService.getDocuments() || [];
-      if (!Array.isArray(docs) || docs.length === 0) {
-        setAiAnalysis("No documents found. Start by uploading notes!");
-        setGeneratingAi(false);
-        return;
-      }
-      const docId = docs[0]._id;
-      const prompt = `Act as an expert AI tutor. Based on this document, briefly summarize the core concepts and suggest 2 immediate study actions I should take today to master this material. Keep it concise.`;
-      const aiRes = await aiService.chat(docId, prompt);
-
-      if (!aiRes || (!aiRes.data && !aiRes.answer)) {
-        throw new Error("Empty AI Response");
-      }
-      setAiAnalysis(aiRes?.data?.answer || aiRes?.answer);
-    } catch (error) {
-      console.error("AI Analysis failed. Using fallback:", error);
-      // We use the new Interactive UI fallback now, so we don't need a massive string here.
-      setAiAnalysis("");
-    } finally {
-      setGeneratingAi(false);
-    }
-  };
 
   const toggleTask = (index) => {
     const newSet = new Set(checkedTasks);
@@ -147,20 +127,20 @@ const DashboardPage = () => {
 
   // --- Mapped Data ---
   const stats = [
-    { label: "Documents", value: overview?.totalDocuments || 0, icon: FileText, trend: `${overview?.topicsCompleted || 0} topics`, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-500/10 border-blue-100 dark:border-blue-500/20" },
-    { label: "Flashcards", value: overview?.totalFlashcardsSets || 0, icon: Layers, trend: "Ready to review", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20" },
-    { label: "Quizzes Taken", value: overview?.totalQuizzes || 0, icon: BrainCircuit, trend: `${overview?.completedQuizzes || 0} completed`, color: "text-indigo-600 dark:text-indigo-400", bg: "bg-indigo-50 dark:bg-indigo-500/10 border-indigo-100 dark:border-indigo-500/20" },
-    { label: "Accuracy", value: `${overview?.averageScore || 0}%`, icon: Target, trend: "Overall avg", color: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-500/10 border-rose-100 dark:border-rose-500/20" }
+    { label: "Documents", value: overview?.totalDocuments || 0, icon: FileText, trend: `${overview?.topicsCompleted || 0} topics` },
+    { label: "Flashcards", value: overview?.totalFlashcardsSets || 0, icon: Layers, trend: "Ready to review" },
+    { label: "Quizzes Taken", value: overview?.totalQuizzes || 0, icon: BrainCircuit, trend: `${overview?.completedQuizzes || 0} completed` },
+    { label: "Accuracy", value: `${overview?.averageScore || 0}%`, icon: Target, trend: "Overall avg" }
   ];
 
   const chartData = (analytics?.recentPerformanceData || []).length > 0
     ? analytics.recentPerformanceData.map((q, i) => ({
-      name: `Q${i + 1}`, fullName: q.title, date: new Date(q.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), score: q.score
+      name: `Session ${i + 1}`, fullName: q.title, date: new Date(q.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), score: q.score
     }))
-    : [{ name: "No Data", score: 0 }];
+    : [];
 
   // Circular Progress Data
-  const dailyProg = Math.min(100, Math.max(10, (overview?.pointsLevel || 1) * 15 + (overview?.studyStreak || 0) * 5));
+  const dailyProg = Math.min(100, Math.max(10, (overview?.pointsLevel || 1) * 15));
   const weeklyProg = Math.min(100, Math.max(20, (overview?.completedQuizzes || 0) * 10));
   const monthlyProg = Math.min(100, overview?.averageScore || 50);
 
@@ -182,6 +162,16 @@ const DashboardPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-[#050505] text-slate-800 dark:text-slate-200 p-4 md:p-6 lg:p-8 font-sans overflow-x-hidden">
+      <style>
+        {`
+          :root {
+            --chart-primary: #1e293b;
+          }
+          .dark, html.dark {
+            --chart-primary: #4f46e5;
+          }
+        `}
+      </style>
       <div className="max-w-[1500px] mx-auto space-y-8 pb-12">
 
         {/* --- HEADER --- */}
@@ -189,19 +179,18 @@ const DashboardPage = () => {
           <div className="space-y-1">
             <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
               Dashboard
-              <span className="bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] py-1 px-2.5 rounded-lg font-black uppercase tracking-widest border border-indigo-200 dark:border-indigo-500/30">Premium</span>
             </h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Welcome back. Manage your study materials and track your progress.</p>
           </div>
 
           <div className="flex items-center gap-3 overflow-x-auto pb-2 w-full lg:w-auto hide-scrollbar self-stretch">
             <DashboardPomodoro />
-            <button onClick={() => navigate('/documents')} className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-[#0a0a0c] border border-slate-200 dark:border-white/10 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm hover:shadow-md transition-all rounded-[12px] text-sm font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap h-full">
+            <Button onClick={() => navigate('/documents')} className="h-10 text-sm">
               <Upload size={16} /> Upload Notes
-            </button>
-            <button onClick={() => navigate('/documents')} className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 dark:bg-indigo-500 border border-indigo-700 dark:border-indigo-400 hover:bg-indigo-700 dark:hover:bg-indigo-400 shadow-sm hover:shadow-md transition-all rounded-[12px] text-sm font-bold text-white whitespace-nowrap h-full">
+            </Button>
+            <Button onClick={() => navigate('/documents')} className="h-10 text-sm">
               <BrainCircuit size={16} /> Create Quiz
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -210,7 +199,7 @@ const DashboardPage = () => {
           {stats.map((stat, i) => (
             <div key={i} className={CARD_STYLE + " group !p-5"}>
               <div className="flex justify-between items-start mb-4">
-                <div className={`p-2.5 rounded-[12px] ${stat.bg} ${stat.color} border group-hover:scale-110 transition-transform duration-300`}>
+                <div className="p-2.5 rounded-[12px] bg-slate-800 text-white dark:bg-indigo-600 border-transparent group-hover:scale-110 transition-transform duration-300">
                   <stat.icon size={20} strokeWidth={2.5} />
                 </div>
               </div>
@@ -232,7 +221,7 @@ const DashboardPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-4">
               <div className="flex flex-col items-center">
                 <div className="w-28 h-28 mb-4 circular-dark-fix relative">
-                  <CircularProgressbar value={dailyProg} text={`${dailyProg}%`} styles={buildStyles({ pathColor: '#6366f1', textColor: 'currentColor', trailColor: 'rgba(148, 163, 184, 0.2)', textSize: '22px', pathTransitionDuration: 1.5 })} />
+                  <CircularProgressbar value={dailyProg} text={`${dailyProg}%`} styles={buildStyles({ pathColor: 'var(--chart-primary)', textColor: 'currentColor', trailColor: 'rgba(148, 163, 184, 0.2)', textSize: '22px', pathTransitionDuration: 1.5 })} />
                 </div>
                 <p className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2"><CalendarDays size={14} className="text-slate-400 dark:text-slate-500" /> Daily Goal</p>
               </div>
@@ -279,31 +268,40 @@ const DashboardPage = () => {
           <div className={`lg:col-span-8 ${CARD_STYLE}`}>
             <CardHeader icon={Activity} title="Performance Analytics" subtitle="Quiz accuracy trends over recent sessions" />
             <div className="h-[250px] w-full mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barSize={36}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.4} /> // lighter grid for both modes
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(val) => `${val}%`} />
-                  <Tooltip cursor={{ fill: 'rgba(148, 163, 184, 0.1)' }} content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      const data = payload[0].payload;
-                      return (
-                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-[0_10px_30px_rgba(0,0,0,0.1)] rounded-[12px] p-4 text-center">
-                          <p className="text-sm font-bold text-slate-900 dark:text-white">{data.fullName}</p>
-                          <p className="text-[24px] font-black text-indigo-600 dark:text-indigo-400 mt-1">{data.score}%</p>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                  />
-                  <Bar dataKey="score" radius={[6, 6, 0, 0]}>
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.score >= 80 ? '#10b981' : entry.score >= 50 ? '#6366f1' : '#f43f5e'} className="hover:opacity-80 transition-opacity" />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.4} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(val) => `${val}%`} />
+                    <Tooltip cursor={{ stroke: 'rgba(99, 102, 241, 0.2)', strokeWidth: 2, strokeDasharray: '4 4' }} content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-[0_10px_30px_rgba(0,0,0,0.1)] rounded-[12px] p-4 text-center">
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">{data.fullName}</p>
+                            <p className="text-[24px] font-black text-slate-800 dark:text-indigo-400 mt-1">{data.score}%</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="score"
+                      stroke="var(--chart-primary)"
+                      strokeWidth={3}
+                      dot={{ r: 4, strokeWidth: 2, fill: '#fff', stroke: 'var(--chart-primary)' }}
+                      activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--chart-primary)' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-slate-400 text-sm font-medium text-center px-4">
+                  Take quizzes to start tracking your learning progress.
+                </div>
+              )}
             </div>
           </div>
 
@@ -324,7 +322,7 @@ const DashboardPage = () => {
                     />
                     <Bar dataKey="activity" radius={[0, 4, 4, 0]}>
                       {(analytics?.weeklyActivity || []).map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.activity > 0 ? '#6366f1' : 'rgba(148, 163, 184, 0.2)'} className="hover:opacity-80 cursor-pointer" />
+                        <Cell key={`cell-${index}`} fill={entry.activity > 0 ? 'var(--chart-primary)' : 'rgba(148, 163, 184, 0.2)'} className="hover:opacity-80 cursor-pointer" />
                       ))}
                     </Bar>
                   </BarChart>
@@ -348,11 +346,11 @@ const DashboardPage = () => {
                 <div key={idx} className="bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-xl p-4">
                   <div className="flex justify-between items-center mb-3">
                     <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate pr-4">{item.subject}</p>
-                    <p className={`text-sm font-black ${item.accuracy >= 80 ? 'text-emerald-600 dark:text-emerald-400' : item.accuracy >= 50 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400'}`}>{item.accuracy}%</p>
+                    <p className={`text-sm font-black ${item.accuracy >= 80 ? 'text-emerald-600 dark:text-emerald-400' : item.accuracy >= 50 ? 'text-slate-800 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400'}`}>{item.accuracy}%</p>
                   </div>
                   <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-1000 ease-out ${item.accuracy >= 80 ? 'bg-emerald-500' : item.accuracy >= 50 ? 'bg-indigo-500' : 'bg-rose-500'}`}
+                      className={`h-full rounded-full transition-all duration-1000 ease-out ${item.accuracy >= 80 ? 'bg-emerald-500' : item.accuracy >= 50 ? 'bg-slate-800 dark:bg-indigo-500' : 'bg-rose-500'}`}
                       style={{ width: `${item.accuracy}%` }}
                     ></div>
                   </div>
@@ -360,7 +358,7 @@ const DashboardPage = () => {
               ))
             ) : (
               <div className="col-span-full py-8 text-center text-slate-400 text-sm font-medium">
-                Take quizzes to see your subject mastery.
+                Complete quizzes to unlock mastery insights.
               </div>
             )}
           </div>

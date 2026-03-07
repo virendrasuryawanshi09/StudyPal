@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
+import Button from '../../components/common/Button';
 import { BrainCircuit, Mail, Lock, User, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -60,7 +61,7 @@ const RegisterPage = () => {
             Create account
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-           Access your personalized workspace
+            Access your personalized workspace
           </p>
         </div>
 
@@ -75,11 +76,10 @@ const RegisterPage = () => {
 
             <div className="relative">
               <div
-                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${
-                  focusedField === 'username'
+                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${focusedField === 'username'
                     ? 'text-slate-700 dark:text-indigo-400'
                     : 'text-slate-400 dark:text-slate-500'
-                }`}
+                  }`}
               >
                 <User size={18} />
               </div>
@@ -114,11 +114,10 @@ const RegisterPage = () => {
 
             <div className="relative">
               <div
-                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${
-                  focusedField === 'email'
+                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${focusedField === 'email'
                     ? 'text-slate-700 dark:text-indigo-400'
                     : 'text-slate-400 dark:text-slate-500'
-                }`}
+                  }`}
               >
                 <Mail size={18} />
               </div>
@@ -153,11 +152,10 @@ const RegisterPage = () => {
 
             <div className="relative">
               <div
-                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${
-                  focusedField === 'password'
+                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${focusedField === 'password'
                     ? 'text-slate-700 dark:text-indigo-400'
                     : 'text-slate-400 dark:text-slate-500'
-                }`}
+                  }`}
               >
                 <Lock size={18} />
               </div>
@@ -194,20 +192,11 @@ const RegisterPage = () => {
           )}
 
           {/* Button */}
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 rounded-lg font-semibold text-white
-              bg-gradient-to-r from-slate-700 to-slate-600
-              hover:from-slate-600 hover:to-slate-700
-              dark:bg-gradient-to-r dark:from-indigo-600 dark:to-indigo-500
-              dark:hover:from-indigo-500 dark:hover:to-indigo-600
-              transition-all duration-200 ease-out
-              shadow-md hover:shadow-lg
-              hover:-translate-y-[1px] active:translate-y-0
-              focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2
-              flex items-center justify-center gap-2
-              disabled:opacity-60 disabled:cursor-not-allowed"
+            size="lg"
+            className="w-full"
           >
             {loading ? (
               <div className="flex items-center gap-2">
@@ -220,7 +209,7 @@ const RegisterPage = () => {
                 <ArrowRight size={18} className="relative top-[1px]" />
               </>
             )}
-          </button>
+          </Button>
         </form>
 
         {/* Footer */}

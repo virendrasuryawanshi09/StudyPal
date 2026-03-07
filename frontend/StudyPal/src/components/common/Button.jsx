@@ -30,6 +30,13 @@ const Button = ({
     outline:
       'border border-slate-300 text-slate-700 hover:bg-slate-100 ' +
       'dark:border-slate-600 dark:text-slate-200 dark:hover:bg-[#232734]',
+
+    danger:
+      'bg-gradient-to-r from-rose-600 to-rose-500 text-white ' +
+      'hover:from-rose-500 hover:to-rose-600 ' +
+      'dark:from-rose-600 dark:to-rose-500 ' +
+      'dark:hover:from-rose-500 dark:hover:to-rose-600 ' +
+      'shadow-md hover:shadow-lg',
   };
 
   const sizeStyles = {

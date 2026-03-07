@@ -20,6 +20,7 @@ import quizService from "../../services/quizService";
 import aiService from "../../services/aiService";
 import Spinner from "../common/spinner";
 import Modal from "../common/Modal";
+import Button from "../common/Button";
 
 const QuizManager = ({ documentId }) => {
     const [quizzes, setQuizzes] = useState([]);
@@ -189,16 +190,16 @@ const QuizManager = ({ documentId }) => {
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Header Results */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={() => {
                             setSelectedQuiz(null);
                             setQuizResults(null);
                         }}
-                        className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors bg-white/5 dark:bg-[#181b22] px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800"
                     >
                         <ArrowLeft size={18} />
                         Back to Quizzes
-                    </button>
+                    </Button>
 
                     <div className="bg-slate-100 dark:bg-[#232734] text-slate-900 dark:text-slate-100 px-6 py-3 rounded-2xl flex items-center shadow-sm gap-3">
                         <Award className="text-emerald-500" />
@@ -293,13 +294,13 @@ const QuizManager = ({ documentId }) => {
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-100 dark:bg-[#181b22] p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
-                    <button
+                    <Button
+                        variant="outline"
                         onClick={() => setSelectedQuiz(null)}
-                        className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors font-medium px-3 py-1.5 rounded-lg"
                     >
                         <ArrowLeft size={18} />
                         Exit Quiz
-                    </button>
+                    </Button>
 
                     {/* Progress Bar Container */}
                     <div className="w-full md:w-1/3 flex flex-col gap-1">
@@ -361,31 +362,29 @@ const QuizManager = ({ documentId }) => {
 
                 {/* Navigation & Actions */}
                 <div className="flex justify-between items-center max-w-2xl mx-auto px-4">
-                    <button
+                    <Button
+                        variant="outline"
                         onClick={handlePrevQuestion}
                         disabled={currentQuestionIndex === 0}
-                        className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-[#181b22] border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#232734] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                         <ChevronLeft size={18} />
                         Previous
-                    </button>
+                    </Button>
 
                     {isLastQuestion ? (
-                        <button
+                        <Button
                             onClick={handleSubmitQuiz}
                             disabled={!allAnswered || submitting}
-                            className="flex items-center gap-2 px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {submitting ? "Submitting..." : "Submit Quiz"}
-                        </button>
+                        </Button>
                     ) : (
-                        <button
+                        <Button
                             onClick={handleNextQuestion}
-                            className="flex items-center gap-2 px-8 py-3 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 rounded-xl font-semibold transition-all shadow-md"
                         >
                             Next
                             <ChevronRight size={18} />
-                        </button>
+                        </Button>
                     )}
                 </div>
 
@@ -418,10 +417,10 @@ const QuizManager = ({ documentId }) => {
                                 </p>
                             </div>
 
-                            <button
+                            <Button
                                 onClick={handleOpenGenerateModal}
                                 disabled={generating}
-                                className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg font-semibold transition-all hover:opacity-90 disabled:opacity-70 w-full sm:w-auto justify-center"
+                                className="w-full sm:w-auto"
                             >
                                 {generating ? (
                                     <>
@@ -434,7 +433,7 @@ const QuizManager = ({ documentId }) => {
                                         New AI Quiz
                                     </>
                                 )}
-                            </button>
+                            </Button>
                         </div>
 
                         {/* Quiz List */}
@@ -449,12 +448,12 @@ const QuizManager = ({ documentId }) => {
                                 </div>
                                 <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">No Quizzes Yet</h4>
                                 <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6 text-sm">Generate an AI-powered quiz from your document to start testing your knowledge.</p>
-                                <button
+                                <Button
+                                    variant="outline"
                                     onClick={handleOpenGenerateModal}
-                                    className="px-6 py-2.5 bg-white dark:bg-[#232734] text-slate-900 dark:text-slate-100 font-semibold rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-700"
                                 >
                                     Generate First Quiz
-                                </button>
+                                </Button>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -567,19 +566,16 @@ const QuizManager = ({ documentId }) => {
                         </div>
 
                         <div className="flex justify-end gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
-                            <button
-                                type="button"
+                            <Button
+                                variant="secondary"
                                 onClick={() => setIsGenerateModalOpen(false)}
-                                className="px-6 py-2.5 font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#232734] rounded-lg transition-colors"
                             >
                                 Cancel
-                            </button>
+                            </Button>
 
-                            <button
-                                type="button"
+                            <Button
                                 onClick={handleGenerateQuiz}
                                 disabled={generating}
-                                className="px-6 py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold rounded-lg transition-all flex items-center gap-2 disabled:opacity-70"
                             >
                                 {generating ? (
                                     <>
@@ -587,7 +583,7 @@ const QuizManager = ({ documentId }) => {
                                         Generating
                                     </>
                                 ) : "Generate Quiz"}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </Modal>
@@ -605,22 +601,20 @@ const QuizManager = ({ documentId }) => {
                         </div>
 
                         <div className="flex justify-end gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
-                            <button
-                                type="button"
+                            <Button
+                                variant="secondary"
                                 onClick={() => setIsDeleteModalOpen(false)}
-                                className="px-6 py-2.5 font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#232734] rounded-lg transition-colors"
                             >
                                 Cancel
-                            </button>
+                            </Button>
 
-                            <button
-                                type="button"
+                            <Button
+                                variant="danger"
                                 onClick={handleConfirmDelete}
                                 disabled={deleting}
-                                className="px-6 py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-semibold rounded-lg transition-colors disabled:opacity-70"
                             >
                                 {deleting ? "Deleting..." : "Delete"}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </Modal>

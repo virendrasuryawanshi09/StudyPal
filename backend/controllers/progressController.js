@@ -40,12 +40,10 @@ export const getDashboard = async (req, res, next) => {
 
         const recentQuizzes = await Quiz.find({ userId })
             .sort({ createdAt: -1 })
-            .limit(10) // fetch more to calculate analytics
             .populate('documentId', 'title')
-            .select('title score totalQuestions completedAt');
+            .select('title score totalQuestions completedAt createdAt');
 
         const user = await User.findById(userId);
-        const studyStreak = user?.studyStreak || 0;
         const points = user?.points || 0;
         const pointsLevel = user?.pointsLevel || 1;
 
@@ -152,31 +150,43 @@ export const getDashboard = async (req, res, next) => {
 
         // 4. Weekly Heatmap Data (Map recent activity to Mon-Sun)
         const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const currentDayIndex = new Date().getDay();
 
         // Initialize last 7 days ending today
         const weeklyActivityMap = new Map();
         for (let i = 6; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
-            weeklyActivityMap.set(days[d.getDay()], 0);
+            d.setHours(0, 0, 0, 0);
+            weeklyActivityMap.set(days[d.getDay()], { date: d.getTime(), count: 0 });
         }
 
-        // Simulate activity parsing from recent docs and quizzes
+        // Tally Documents
         recentDocuments.forEach(doc => {
-            const dayName = days[new Date(doc.lastAccessed || doc.createdAt).getDay()];
-            if (weeklyActivityMap.has(dayName)) {
-                weeklyActivityMap.set(dayName, weeklyActivityMap.get(dayName) + 1);
-            }
-        });
-        recentQuizzes.forEach(quiz => {
-            const dayName = days[new Date(quiz.completedAt || quiz.createdAt).getDay()];
-            if (weeklyActivityMap.has(dayName)) {
-                weeklyActivityMap.set(dayName, weeklyActivityMap.get(dayName) + 1);
+            const docDate = new Date(doc.lastAccessed || doc.createdAt);
+            docDate.setHours(0, 0, 0, 0);
+            const dayName = days[docDate.getDay()];
+
+            if (weeklyActivityMap.has(dayName) && docDate.getTime() === weeklyActivityMap.get(dayName).date) {
+                weeklyActivityMap.get(dayName).count += 1;
             }
         });
 
-        const weeklyActivity = Array.from(weeklyActivityMap, ([day, activity]) => ({ day, activity }));
+        // Tally Quizzes
+        recentQuizzes.forEach(quiz => {
+            const quizDate = new Date(quiz.completedAt || quiz.createdAt);
+            quizDate.setHours(0, 0, 0, 0);
+            const dayName = days[quizDate.getDay()];
+
+            if (weeklyActivityMap.has(dayName) && quizDate.getTime() === weeklyActivityMap.get(dayName).date) {
+                weeklyActivityMap.get(dayName).count += 1;
+            }
+        });
+
+        // Convert Map to Array format for Recharts
+        const weeklyActivity = Array.from(weeklyActivityMap, ([day, data]) => ({
+            day,
+            activity: data.count
+        }));
 
         res.status(200).json({
             success: true,
@@ -190,7 +200,6 @@ export const getDashboard = async (req, res, next) => {
                     totalQuizzes,
                     completedQuizzes,
                     averageScore,
-                    studyStreak,
                     points,
                     pointsLevel,
                     totalStudyTimeHours,
@@ -205,12 +214,12 @@ export const getDashboard = async (req, res, next) => {
                     learningInsights,
                     knowledgeMastery,
                     weeklyActivity,
-                    recentPerformanceData: recentQuizzes.filter(q => q.completedAt).slice(0, 10).map(q => ({
+                    recentPerformanceData: recentQuizzes.filter(q => q.completedAt).map(q => ({
                         id: q._id,
-                        title: q.title,
+                        title: q.title || q.documentId?.title || 'Quiz',
                         score: q.score,
                         completedAt: q.completedAt
-                    }))
+                    })).slice(0, 10).reverse() // Reverse so chronological order (oldest to newest) shows left-to-right on chart
                 }
             }
         })

@@ -55,4 +55,7 @@ export const API_PATHS = {
         GET_DASHBOARD: "/api/progress/dashboard",
     },
 
+    PROFILE: {
+        GET_ANALYTICS: "/api/profile/analytics",
+    }
 };

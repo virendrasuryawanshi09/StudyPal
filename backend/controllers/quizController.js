@@ -114,22 +114,6 @@ export const submitQuiz = async (req, res, next) => {
             const pointsToAdd = 10 + Math.floor(score / 2);
             user.points = (user.points || 0) + pointsToAdd;
 
-            // Update streak
-            const today = moment().startOf('day');
-            if (user.lastStudyDate) {
-                const lastDate = moment(user.lastStudyDate).startOf('day');
-                const diff = today.diff(lastDate, 'days');
-
-                if (diff === 1) {
-                    user.studyStreak += 1;
-                } else if (diff > 1) {
-                    user.studyStreak = 1;
-                }
-            } else {
-                user.studyStreak = 1;
-            }
-            user.lastStudyDate = today.toDate();
-
             // Level up every 100 points
             user.pointsLevel = Math.floor(user.points / 100) + 1;
 

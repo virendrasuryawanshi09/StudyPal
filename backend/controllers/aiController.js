@@ -15,6 +15,14 @@ const logError = (type, error) => {
     }
 };
 
+const handleAiError = (res, type, error) => {
+    logError(type, error);
+    if (error.message?.toLowerCase().includes("quota exceeded") || error.message?.includes("429")) {
+        return res.status(429).json({ success: false, error: "AI Limit Reached. Please wait a minute before trying again." });
+    }
+    return res.status(500).json({ success: false, error: error.message || "An unexpected AI error occurred." });
+};
+
 /* ---------------------- FLASHCARDS ---------------------- */
 
 export const generateFlashcards = async (req, res, next) => {
@@ -45,11 +53,6 @@ export const generateFlashcards = async (req, res, next) => {
             document.extractedText,
             Number(count)
         );
-
-        console.log("========== GEMINI RAW RESPONSE START ==========");
-        console.log(cards);
-        console.log("TYPE OF CARDS:", typeof cards);
-        console.log("========== GEMINI RAW RESPONSE END ==========");
 
         if (typeof cards === "string") {
             const flashcardsArray = [];
@@ -96,8 +99,7 @@ export const generateFlashcards = async (req, res, next) => {
         });
 
     } catch (error) {
-        logError('FLASHCARD ERROR', error);
-        res.status(500).json({ success: false, error: error.message });
+        return handleAiError(res, 'FLASHCARD ERROR', error);
     }
 };
 
@@ -167,8 +169,7 @@ export const generateQuiz = async (req, res, next) => {
             message: 'Quiz generated successfully',
         });
     } catch (error) {
-        logError('QUIZ ERROR', error);
-        res.status(500).json({ success: false, error: error.message });
+        return handleAiError(res, 'QUIZ ERROR', error);
     }
 };
 
@@ -219,8 +220,7 @@ export const generateSummary = async (req, res, next) => {
             message: 'Summary generated successfully',
         });
     } catch (error) {
-        logError('SUMMARY ERROR', error);
-        res.status(500).json({ success: false, error: error.message });
+        return handleAiError(res, 'SUMMARY ERROR', error);
     }
 };
 
@@ -265,9 +265,6 @@ export const chat = async (req, res, next) => {
             relevantChunks = chunks.slice(0, 1);
         }
 
-        console.log('CHAT QUESTION:', question);
-        console.log('CHAT CONTEXT LENGTH:', relevantChunks[0]?.content?.length || 0);
-
         const answer = await geminiService.chatWithContext(
             question,
             relevantChunks
@@ -279,8 +276,7 @@ export const chat = async (req, res, next) => {
             message: 'Response generated successfully',
         });
     } catch (error) {
-        logError('CHAT ERROR', error);
-        res.status(500).json({ success: false, error: error.message });
+        return handleAiError(res, 'CHAT ERROR', error);
     }
 };
 
@@ -350,8 +346,7 @@ export const explainConcept = async (req, res, next) => {
             message: 'Explanation generated successfully',
         });
     } catch (error) {
-        logError('EXPLAIN ERROR', error);
-        res.status(500).json({ success: false, error: error.message });
+        return handleAiError(res, 'EXPLAIN ERROR', error);
     }
 };
 

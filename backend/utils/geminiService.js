@@ -7,7 +7,7 @@ if (!process.env.GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY is missing in .env");
 }
 
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
 
 
@@ -51,12 +51,15 @@ async function callGemini(prompt, retries = 3) {
           continue;
         }
 
-        // Quota truly exhausted or unrecoverable
-        if (status === "RESOURCE_EXHAUSTED") {
-          throw new Error("AI quota exceeded. Please wait a moment and try again.");
+        if (status === "RESOURCE_EXHAUSTED" || res.status === 429) {
+          const quotaError = new Error("AI quota exceeded. Please wait a moment and try again.");
+          quotaError.status = 429;
+          throw quotaError;
         }
 
-        throw new Error(message);
+        const customError = new Error(message);
+        customError.status = res.status;
+        throw customError;
       }
 
       if (!data.candidates || !data.candidates.length) {

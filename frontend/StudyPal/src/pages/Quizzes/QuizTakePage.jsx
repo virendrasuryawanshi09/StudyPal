@@ -4,6 +4,7 @@ import { Brain, ArrowLeft, CheckCircle, ChevronLeft, ChevronRight } from "lucide
 import toast from "react-hot-toast";
 import quizService from "../../services/quizService";
 import Spinner from "../../components/common/spinner";
+import Button from "../../components/common/Button";
 
 const QuizTakePage = () => {
   const { quizId } = useParams();
@@ -145,8 +146,8 @@ const QuizTakePage = () => {
                   key={idx}
                   onClick={() => handleAnswerSelect(currentQuestionIndex, option)}
                   className={`w-full text-left p-5 rounded-xl border transition-all duration-200 flex items-center gap-4 group/btn ${isSelected
-                      ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10"
-                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-[#181b22] hover:bg-slate-50 dark:hover:bg-[#232734]"
+                    ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10"
+                    : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-[#181b22] hover:bg-slate-50 dark:hover:bg-[#232734]"
                     }`}
                 >
                   <div className={`flex items-center justify-center w-8 h-8 rounded-lg text-sm font-semibold transition-colors ${isSelected ? "bg-emerald-500 text-white" : "bg-slate-100 dark:bg-[#232734] text-slate-500 dark:text-slate-400 group-hover/btn:text-slate-700 dark:group-hover/btn:text-slate-200"
@@ -168,31 +169,35 @@ const QuizTakePage = () => {
 
       {/* Navigation & Actions */}
       <div className="flex justify-between items-center max-w-2xl mx-auto px-4 gap-4">
-        <button
+        <Button
+          variant="outline"
+          size="lg"
           onClick={handlePrevQuestion}
           disabled={currentQuestionIndex === 0}
-          className="flex items-center justify-center w-12 h-12 md:w-auto md:px-6 md:h-12 rounded-xl font-semibold text-sm text-slate-600 dark:text-slate-400 bg-white dark:bg-[#181b22] border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#232734] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          className="w-12 px-0 md:px-6 md:w-auto"
         >
           <ChevronLeft size={18} className="md:mr-2" />
           <span className="hidden md:inline">Previous</span>
-        </button>
+        </Button>
 
         {isLastQuestion ? (
-          <button
+          <Button
             onClick={handleSubmitQuiz}
             disabled={!allAnswered || submitting}
-            className="flex-1 max-w-[240px] flex items-center justify-center gap-2 h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            size="lg"
+            className="flex-1 max-w-[240px]"
           >
             {submitting ? "Submitting..." : "Submit Quiz"}
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
             onClick={handleNextQuestion}
-            className="flex-1 max-w-[240px] flex items-center justify-center gap-2 h-12 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 rounded-xl font-semibold text-sm transition-all"
+            size="lg"
+            className="flex-1 max-w-[240px]"
           >
             Next Question
             <ChevronRight size={18} />
-          </button>
+          </Button>
         )}
       </div>
 

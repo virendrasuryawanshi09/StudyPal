@@ -1,370 +1,400 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import authService from '../../services/authService';
-import progressService from '../../services/progressSevice';
+import profileService from '../../services/profileService';
+import CalendarHeatmap from 'react-calendar-heatmap';
+import { Tooltip } from 'react-tooltip';
+import 'react-calendar-heatmap/dist/styles.css';
 import Spinner from '../../components/common/spinner';
-import toast from 'react-hot-toast';
+import Button from '../../components/common/Button';
 import {
-  User,
-  Mail,
-  Shield,
-  LogOut,
-  Award,
-  Flame,
-  Zap,
-  CheckCircle2,
-  ChevronRight,
-  Save,
-  Activity,
-  Key
+  BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid
+} from 'recharts';
+import {
+  User, UserCircle, Flame, BookOpen, Layers, Target, Clock, Activity, Edit2, Check, X,
+  Mail, Settings, Shield
 } from 'lucide-react';
+import moment from 'moment';
+import toast from 'react-hot-toast';
+import authService from '../../services/authService';
 
 const ProfilePage = () => {
-  const { user, logout, updateUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'identity', 'security'
-  const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState(null);
+  const { user, updateUser } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [analytics, setAnalytics] = useState(null);
 
-  const [profileData, setProfileData] = useState({
-    username: user?.username || '',
-    email: user?.email || '',
-  });
+  // Edit Name State
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [isSavingName, setIsSavingName] = useState(false);
 
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
+  const fetchProfileData = async (silent = false) => {
+    try {
+      if (!silent) setLoading(true);
+      const res = await profileService.getProfileAnalytics();
+      setAnalytics(res.data);
+      if (!silent && res.data?.profile?.name) {
+        setNewName(res.data.profile.name);
+      }
+    } catch (error) {
+      if (!silent) toast.error(error.message || "Failed to load profile data");
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await progressService.getDashboardData();
-        setStats(res.data?.overview);
-      } catch (error) {
-        console.error("Failed to fetch profile stats:", error);
-      }
-    };
-    fetchStats();
+    let intervalId;
+    fetchProfileData(false);
+    intervalId = setInterval(() => {
+      fetchProfileData(true);
+    }, 10000);
+    return () => clearInterval(intervalId);
   }, []);
 
-  const handleUpdateProfile = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleNameUpdate = async () => {
+    if (!newName.trim() || newName.trim() === profile?.name) {
+      setIsEditingName(false);
+      return;
+    }
+
     try {
-      const res = await authService.updateProfile(profileData);
-      updateUser(res.data);
-      toast.success("Profile updated successfully!");
+      setIsSavingName(true);
+      await authService.updateProfile({ username: newName.trim() });
+      updateUser({ username: newName.trim() });
+      setAnalytics(prev => ({
+        ...prev,
+        profile: { ...prev.profile, name: newName.trim() }
+      }));
+      toast.success("Name updated successfully!");
+      setIsEditingName(false);
     } catch (error) {
-      toast.error(error.message || "Failed to update profile");
+      toast.error(error.message || "Failed to update name");
     } finally {
-      setLoading(false);
+      setIsSavingName(false);
     }
   };
 
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      return toast.error("New passwords do not match");
-    }
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[70vh]">
+        <div className="flex flex-col items-center gap-6 text-slate-400">
+          <Spinner />
+          <p className="font-medium text-sm text-slate-500">Loading your profile data...</p>
+        </div>
+      </div>
+    );
+  }
 
-    setLoading(true);
-    try {
-      await authService.changePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
-      });
-      toast.success("Password changed successfully!");
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (error) {
-      toast.error(error.message || "Failed to change password");
-    } finally {
-      setLoading(false);
-    }
+  const {
+    profile, studyStats, dailyActivity, weeklyActivity, knowledgeMastery, recentActivity
+  } = analytics || {};
+
+  const getScaleColor = (count) => {
+    if (!count || count === 0) return 'color-empty';
+    if (count === 1) return 'color-scale-1'; // #818cf8 (Indigo 400)
+    if (count <= 3) return 'color-scale-2';  // #6366f1 (Indigo 500)
+    if (count <= 5) return 'color-scale-3';  // #4f46e5 (Indigo 600)
+    return 'color-scale-4';                  // #4338ca (Indigo 700)
   };
 
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: Activity },
-    { id: 'identity', label: 'Identity', icon: User },
-    { id: 'security', label: 'Security', icon: Shield },
-  ];
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-[0_10px_30px_rgba(0,0,0,0.1)] rounded-[12px] p-3 text-center">
+          <p className="text-sm font-bold text-slate-900 dark:text-white">{label}</p>
+          <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">{`${payload[0].value} events`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // --- Premium Styling Constants (Matching Dashboard) ---
+  const CARD_STYLE = "bg-white dark:bg-[#0a0a0c] border border-slate-200 dark:border-white/10 rounded-[16px] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.03)] dark:shadow-none hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] dark:hover:border-white/20 transition-all duration-300 hover:-translate-y-1";
+
+  const CardHeader = ({ icon: Icon, title, subtitle, action }) => (
+    <div className="flex items-start justify-between mb-6">
+      <div className="flex items-center gap-3">
+        <div className="p-2.5 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl text-slate-600 dark:text-slate-300 shadow-sm">
+          <Icon size={18} strokeWidth={2.5} />
+        </div>
+        <div>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">{title}</h2>
+          {subtitle && <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</p>}
+        </div>
+      </div>
+      {action}
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 p-4 md:p-8 font-sans selection:bg-blue-500/30">
+    <div className="min-h-screen bg-slate-50/50 dark:bg-[#050505] text-slate-800 dark:text-slate-200 p-4 md:p-6 lg:p-8 font-sans overflow-x-hidden">
+      <style>
+        {`
+          :root {
+            --chart-primary: #1e293b;
+          }
+          .dark, html.dark {
+            --chart-primary: #4f46e5;
+          }
+          .react-calendar-heatmap .color-empty { fill: rgba(148, 163, 184, 0.1); }
+          .dark .react-calendar-heatmap .color-empty { fill: rgba(148, 163, 184, 0.1); }
+          
+          .react-calendar-heatmap .color-scale-1 { fill: #94a3b8; }
+          .react-calendar-heatmap .color-scale-2 { fill: #64748b; }
+          .react-calendar-heatmap .color-scale-3 { fill: #475569; }
+          .react-calendar-heatmap .color-scale-4 { fill: #1e293b; }
+          
+          .dark .react-calendar-heatmap .color-scale-1 { fill: #a5b4fc; }
+          .dark .react-calendar-heatmap .color-scale-2 { fill: #818cf8; }
+          .dark .react-calendar-heatmap .color-scale-3 { fill: #6366f1; }
+          .dark .react-calendar-heatmap .color-scale-4 { fill: #4f46e5; }
+          
+          .react-calendar-heatmap rect { rx: 2; ry: 2; }
+          .react-calendar-heatmap text { fill: #64748b; font-size: 8px; font-weight: 600; }
+        `}
+      </style>
 
-      <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-
-        {/* Header Section */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-10 shadow-sm flex flex-col md:flex-row items-center gap-8 relative overflow-hidden group">
-
-          {/* Avatar container */}
-          <div className="relative shrink-0">
-            <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white dark:border-slate-800 bg-slate-100 dark:bg-slate-800 shadow-lg flex items-center justify-center overflow-hidden">
-              <img
-                src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user?.username || 'user'}&backgroundColor=f8fafc`}
-                alt="Avatar"
-                className="w-full h-full object-cover"
-              />
+      <div className="max-w-[1500px] mx-auto space-y-8 pb-12">
+        {/* --- HEADER --- */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+          <div className="flex items-center gap-4 border-b border-transparent lg:border-none pb-4 lg:pb-0 w-full lg:w-auto">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center text-white font-extrabold text-2xl shadow-lg shadow-indigo-500/20 shrink-0">
+              {profile?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
-            {/* Level badge */}
-            <div className="absolute -bottom-2 md:bottom-2 -right-2 md:-right-4 bg-blue-600 text-white border-2 border-white dark:border-slate-900 px-4 py-1.5 rounded-full text-xs font-bold tracking-wider shadow-md flex items-center gap-1.5 z-10">
-              <Award size={14} />
-              LVL {stats?.pointsLevel || 1}
-            </div>
-          </div>
-
-          {/* User Info */}
-          <div className="flex-1 text-center md:text-left space-y-2 relative z-10">
-            <div className="flex items-center justify-center md:justify-start gap-3">
-              <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                {user?.username}
-              </h1>
-              <span className="px-2.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-widest leading-none">
-                Pro
-              </span>
-            </div>
-            <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center md:justify-start gap-2 text-sm md:text-base">
-              <Mail size={16} />
-              {user?.email}
-            </p>
-          </div>
-
-          <div className="shrink-0 flex items-center gap-4 relative z-10">
-            <button
-              onClick={logout}
-              className="px-5 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-xl transition-all border border-slate-200 dark:border-slate-700 flex items-center gap-2 shadow-sm text-sm"
-            >
-              <LogOut size={16} />
-              Sign Out
-            </button>
-          </div>
-        </div>
-
-        {/* Content Layout */}
-        <div className="flex flex-col lg:flex-row gap-8">
-
-          {/* Elegant Sidebar Nav */}
-          <div className="lg:w-64 shrink-0">
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3 shadow-sm sticky top-8 flex flex-row lg:flex-col gap-2 overflow-x-auto hide-scrollbar">
-              {tabs.map((tab) => {
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl font-semibold transition-all duration-300 text-sm md:text-base whitespace-nowrap lg:whitespace-normal ${isActive
-                        ? "bg-slate-900 dark:bg-blue-600 text-white shadow-md shadow-slate-200/50 dark:shadow-blue-900/20"
-                        : "text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
-                      }`}
+            <div className="space-y-1">
+              {isEditingName ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    disabled={isSavingName}
+                    className="bg-white dark:bg-[#181b22] border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg px-3 py-1.5 text-xl font-bold w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                    autoFocus
+                    onKeyDown={(e) => e.key === 'Enter' && handleNameUpdate()}
+                  />
+                  <Button
+                    onClick={handleNameUpdate}
+                    disabled={isSavingName}
+                    variant="primary"
+                    className="px-3 min-w-[40px] shrink-0 h-10"
+                    title="Save Name"
                   >
-                    <tab.icon size={18} className={`${isActive ? 'text-white' : 'text-slate-400'} shrink-0`} />
-                    <span>{tab.label}</span>
+                    <Check className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    onClick={() => setIsEditingName(false)}
+                    disabled={isSavingName}
+                    variant="outline"
+                    className="px-3 min-w-[40px] shrink-0 h-10"
+                    title="Cancel"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+                    {profile?.name || 'Student'}
+                  </h1>
+                  <button
+                    onClick={() => { setNewName(profile?.name || 'Student'); setIsEditingName(true); }}
+                    className="p-1.5 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors tooltip-target shrink-0"
+                    title="Edit Name"
+                  >
+                    <Edit2 className="w-4 h-4" />
                   </button>
-                );
-              })}
+                </div>
+              )}
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-xs font-bold tracking-wide">
+                  Level {profile?.level || 1} Scholar
+                </span>
+                <span className="text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center gap-1.5">
+                  <Mail className="w-4 h-4" /> {user?.email}
+                </span>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Tab Content */}
-          <div className="flex-1">
-
-            {/* OVERVIEW TAB */}
-            {activeTab === 'overview' && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {/* Streak Card */}
-                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                    <div className="w-12 h-12 rounded-2xl bg-orange-100 dark:bg-orange-500/10 flex items-center justify-center text-orange-600 dark:text-orange-400 mb-4 group-hover:scale-110 transition-transform duration-500">
-                      <Flame size={24} fill="currentColor" strokeWidth={1} />
-                    </div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5">Study Streak</p>
-                    <div className="flex items-end gap-2">
-                      <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{stats?.studyStreak || 0}</p>
-                      <span className="text-sm font-medium text-slate-500 mb-1">Days</span>
-                    </div>
-                  </div>
-
-                  {/* XP Card */}
-                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4 group-hover:scale-110 transition-transform duration-500">
-                      <Zap size={24} fill="currentColor" strokeWidth={1} />
-                    </div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5">Total Experience</p>
-                    <div className="flex items-end gap-2">
-                      <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{stats?.points || 0}</p>
-                      <span className="text-sm font-medium text-slate-500 mb-1">XP</span>
-                    </div>
-                  </div>
-
-                  {/* Level Card */}
-                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4 group-hover:scale-110 transition-transform duration-500">
-                      <Award size={24} />
-                    </div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5">Current Rank</p>
-                    <div className="flex items-end gap-2">
-                      <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Level {stats?.pointsLevel || 1}</p>
-                    </div>
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* IDENTY CARD (Col 4) */}
+          <div className={`lg:col-span-4 flex flex-col justify-center space-y-6 ${CARD_STYLE}`}>
+            <CardHeader icon={User} title="Account Details" subtitle="Manage your identity and subscription" />
+            <div className="space-y-4 flex-1">
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10">
+                <div className="w-10 h-10 rounded-lg bg-slate-800 text-white dark:bg-indigo-600 flex items-center justify-center shrink-0">
+                  <Shield size={20} />
                 </div>
-
-                {/* Progress Banner */}
-                <div className="bg-slate-900 dark:bg-slate-800 rounded-3xl p-8 shadow-lg relative overflow-hidden">
-                  <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none">
-                    <Activity size={200} className="translate-x-1/4 translate-y-1/4" />
-                  </div>
-
-                  <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
-                    <div className="flex-1 space-y-5 w-full">
-                      <div>
-                        <h2 className="text-2xl font-bold text-white mb-2">Learning Trajectory</h2>
-                        <p className="text-slate-300 text-sm leading-relaxed max-w-lg">
-                          Maintain consistent study habits to evolve your proficiency and earn advanced learning badges.
-                        </p>
-                      </div>
-
-                      <div className="pt-2">
-                        <div className="flex justify-between items-end mb-2">
-                          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Progress</span>
-                          <span className="text-xs font-bold text-white">
-                            <span className="text-slate-400 mr-1">LVL {(stats?.pointsLevel || 1) + 1}</span>
-                            {stats?.points % 100}%
-                          </span>
-                        </div>
-                        <div className="w-full h-3 bg-slate-800 dark:bg-slate-900 rounded-full overflow-hidden flex shadow-inner">
-                          <div
-                            className="h-full bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all duration-1000 ease-out"
-                            style={{ width: `${stats?.points % 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Plan</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Premium Scholar</p>
                 </div>
               </div>
-            )}
 
-            {/* IDENTITY TAB */}
-            {activeTab === 'identity' && (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 md:p-10 shadow-sm animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="flex items-center gap-4 mb-8 pb-6 border-b border-slate-100 dark:border-slate-800">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center">
-                    <User size={24} />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Personal Data</h2>
-                    <p className="text-sm text-slate-500 mt-1">Manage your profile identification details</p>
-                  </div>
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10">
+                <div className="w-10 h-10 rounded-lg bg-slate-800 text-white dark:bg-indigo-600 flex items-center justify-center shrink-0">
+                  <Clock size={20} />
                 </div>
-
-                <form onSubmit={handleUpdateProfile} className="space-y-6 max-w-xl">
-                  <div className="space-y-5">
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-widest ml-1">Display Name</label>
-                      <input
-                        type="text"
-                        value={profileData.username}
-                        onChange={(e) => setProfileData({ ...profileData, username: e.target.value })}
-                        className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
-                        placeholder="Enter your new name"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-                      <input
-                        type="email"
-                        value={profileData.email}
-                        onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                        className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
-                        placeholder="account@domain.com"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-center gap-4 pt-6">
-                    <button
-                      disabled={loading}
-                      type="submit"
-                      className="w-full sm:w-auto px-8 py-3.5 bg-slate-900 dark:bg-blue-600 text-white font-bold rounded-2xl hover:bg-slate-800 dark:hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-md disabled:opacity-50"
-                    >
-                      {loading ? <Spinner /> : <><Save size={18} /> Save Changes</>}
-                    </button>
-                    <p className="text-xs text-slate-500 flex items-center justify-center gap-1.5 mt-4 sm:mt-0">
-                      <CheckCircle2 size={14} className="text-emerald-500" />
-                      Changes propagate instantly
-                    </p>
-                  </div>
-                </form>
+                <div>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Joined</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{moment(user?.createdAt || new Date()).format("MMMM YYYY")}</p>
+                </div>
               </div>
-            )}
+            </div>
+            <Button variant="outline" className="w-full">
+              <Settings size={16} /> Manage Settings
+            </Button>
+          </div>
 
-            {/* SECURITY TAB */}
-            {activeTab === 'security' && (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 md:p-10 shadow-sm animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="flex items-center gap-4 mb-8 pb-6 border-b border-slate-100 dark:border-slate-800">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center">
-                    <Key size={24} />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Access Credentials</h2>
-                    <p className="text-sm text-slate-500 mt-1">Update your password to secure your account</p>
-                  </div>
-                </div>
-
-                <form onSubmit={handleChangePassword} className="space-y-6 max-w-xl">
-                  <div className="space-y-5">
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-widest ml-1">Current Password</label>
-                      <input
-                        required
-                        type="password"
-                        value={passwordData.currentPassword}
-                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                        className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
-                        placeholder="••••••••••••"
-                      />
-                    </div>
-
-                    <div className="space-y-2 border-t border-slate-100 dark:border-slate-800 pt-5 mt-2">
-                      <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-widest ml-1">New Password</label>
-                      <input
-                        required
-                        type="password"
-                        value={passwordData.newPassword}
-                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                        className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
-                        placeholder="Required 8+ characters"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-widest ml-1">Confirm New Password</label>
-                      <input
-                        required
-                        type="password"
-                        value={passwordData.confirmPassword}
-                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                        className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
-                        placeholder="Confirm your new password"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="pt-6">
-                    <button
-                      disabled={loading}
-                      type="submit"
-                      className="w-full sm:w-auto px-8 py-3.5 bg-slate-900 dark:bg-blue-600 text-white font-bold rounded-2xl hover:bg-slate-800 dark:hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-md disabled:opacity-50"
-                    >
-                      {loading ? <Spinner /> : <><Shield size={18} /> Update Password</>}
-                    </button>
-                  </div>
-                </form>
+          {/* LEETCODE HEATMAP (Col 8) */}
+          <div className={`lg:col-span-8 flex flex-col justify-between overflow-x-auto ${CARD_STYLE}`}>
+            <CardHeader icon={Activity} title="Study Streak Heatmap" subtitle="Your learning consistency over the past year" />
+            <div className="w-full min-w-[700px] mt-4">
+              <CalendarHeatmap
+                startDate={moment().subtract(365, 'days').toDate()}
+                endDate={new Date()}
+                values={dailyActivity || []}
+                classForValue={(value) => getScaleColor(value?.count)}
+                tooltipDataAttrs={(value) => {
+                  const dateRaw = value?.date ? moment(value.date).format('MMM Do, YYYY') : 'No Data';
+                  const countRaw = value?.count ? `${value.count} activity events` : 'No events';
+                  return {
+                    'data-tooltip-id': 'heatmap-tooltip',
+                    'data-tooltip-content': `${countRaw} on ${dateRaw}`,
+                  };
+                }}
+                showWeekdayLabels={true}
+                gutterSize={3}
+              />
+              <Tooltip id="heatmap-tooltip" className="!bg-slate-900 !text-white !rounded-lg !text-sm !font-medium" />
+            </div>
+            {(!dailyActivity || dailyActivity.length === 0) && (
+              <div className="text-center mt-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Start studying to light up your heatmap!</p>
               </div>
             )}
           </div>
         </div>
+
+        {/* --- ROW 2 --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* WEEKLY ACTIVITY CHART (Col 8) */}
+          <div className={`lg:col-span-8 flex flex-col ${CARD_STYLE}`}>
+            <CardHeader icon={BarChart} title="Weekly Study Activity" subtitle="Your activity volume over the last 7 days" />
+            <div className="h-[250px] w-full mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weeklyActivity || []} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#94a3b8" strokeOpacity={0.2} />
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} />
+                  <RechartsTooltip cursor={{ fill: 'rgba(99, 102, 241, 0.05)' }} content={<CustomTooltip />} />
+                  <Bar dataKey="activity" fill="var(--chart-primary)" radius={[4, 4, 4, 4]} barSize={40} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* STATS CARDS (Col 4) */}
+          <div className="lg:col-span-4 grid grid-cols-2 gap-4">
+            {[
+              { label: "Documents", value: studyStats?.documentsUploaded || 0, icon: BookOpen },
+              { label: "Flashcards", value: studyStats?.flashcardsCreated || 0, icon: Layers },
+              { label: "Quizzes", value: studyStats?.quizzesCompleted || 0, icon: Target },
+              { label: "Hours", value: studyStats?.totalStudyTime || 0, icon: Clock }
+            ].map((stat, i) => (
+              <div key={i} className={`flex flex-col justify-center ${CARD_STYLE} !p-5 group`}>
+                <div className="p-2.5 rounded-[12px] w-max mb-4 bg-slate-800 text-white dark:bg-indigo-600 border-transparent group-hover:scale-110 transition-transform duration-300">
+                  <stat.icon size={20} className="stroke-current" strokeWidth={2.5} />
+                </div>
+                <div>
+                  <p className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">{stat.value}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-wider mt-1">{stat.label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* --- ROW 3 --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* KNOWLEDGE MASTERY (Col 8) */}
+          <div className={`lg:col-span-8 ${CARD_STYLE}`}>
+            <CardHeader icon={Target} title="Knowledge Mastery" subtitle="Subject matter expertise based on quiz performance" />
+            {(!knowledgeMastery || knowledgeMastery.length === 0) ? (
+              <div className="h-full flex flex-col items-center justify-center py-10 text-center opacity-70">
+                <Target className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
+                <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">Take quizzes to unlock subject mastery insights.</p>
+              </div>
+            ) : (
+              <div className="space-y-5 mt-4">
+                {knowledgeMastery.map((topic, idx) => (
+                  <div key={idx}>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-semibold text-sm text-slate-700 dark:text-slate-200">{topic.subject}</span>
+                      <span className={`text-sm font-bold ${topic.mastery >= 80 ? 'text-emerald-600 dark:text-emerald-400' : topic.mastery >= 50 ? 'text-slate-800 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400'}`}>{topic.mastery}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-1000 ease-out ${topic.mastery >= 80 ? 'bg-emerald-500' : topic.mastery >= 50 ? 'bg-slate-800 dark:bg-indigo-500' : 'bg-rose-500'}`}
+                        style={{ width: `${topic.mastery}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* RECENT ACTIVITY TIMELINE (Col 4) */}
+          <div className={`lg:col-span-4 max-h-[400px] overflow-y-auto hide-scrollbar ${CARD_STYLE}`}>
+            <div className="sticky top-0 bg-white dark:bg-[#0a0a0c] z-10 pb-4">
+              <CardHeader icon={Clock} title="Recent Activity" subtitle="Your latest study milestones" />
+            </div>
+            {(!recentActivity || recentActivity.length === 0) ? (
+              <div className="h-full flex flex-col items-center justify-center py-10 text-center opacity-70">
+                <Clock className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
+                <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">No recent learning activity.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {recentActivity.map((event, idx) => {
+                  let Icon = BookOpen;
+                  let colorClass = "bg-slate-800 text-white dark:bg-indigo-600 border-transparent";
+
+                  if (event.type === 'quiz') {
+                    Icon = Target;
+                  } else if (event.type === 'flashcard') {
+                    Icon = Layers;
+                  }
+
+                  return (
+                    <div key={idx} className="flex gap-4">
+                      <div className="relative shrink-0 flex flex-col items-center">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${colorClass} shadow-sm z-10`}>
+                          <Icon size={16} strokeWidth={2.5} />
+                        </div>
+                        {idx !== recentActivity.length - 1 && (
+                          <div className="w-px h-full bg-slate-200 dark:bg-slate-700/50 absolute top-10"></div>
+                        )}
+                      </div>
+                      <div className="pb-6">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-bold text-sm text-slate-800 dark:text-slate-200 capitalize">{event.type}</span>
+                          <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{moment(event.timestamp).fromNow()}</span>
+                        </div>
+                        <p className="text-xs font-medium text-slate-600 dark:text-slate-400 line-clamp-2" title={event.title}>{event.title}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );

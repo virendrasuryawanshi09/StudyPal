@@ -15,6 +15,7 @@ import flashcardService from "../../services/flashcardService";
 import aiService from "../../services/aiService";
 import Spinner from "../common/spinner";
 import Modal from "../common/Modal";
+import Button from "../common/Button";
 
 const FlashcardManager = ({ documentId }) => {
   const [flashcardSets, setFlashcardSets] = useState([]);
@@ -70,22 +71,15 @@ const FlashcardManager = ({ documentId }) => {
     setIsDeleteModalOpen(true);
   };
   const handleConfirmDelete = async () => {
-    console.log("CONFIRM CLICKED");
-    console.log("Stored ID:", setToDelete);
 
     try {
       setDeleting(true);
 
       if (!setToDelete) {
-        console.log("No ID found");
         return;
       }
 
-      console.log("Sending DELETE request...");
-
       await flashcardService.deleteFlashcardSet(setToDelete);
-
-      console.log("DELETE SUCCESS");
 
       setFlashcardSets(prev =>
         prev.filter(item => item._id !== setToDelete)
@@ -97,7 +91,6 @@ const FlashcardManager = ({ documentId }) => {
       setSetToDelete(null);
 
     } catch (error) {
-      console.log("DELETE ERROR:", error);
       toast.error("Delete failed");
     } finally {
       setDeleting(false);
@@ -246,13 +239,14 @@ const FlashcardManager = ({ documentId }) => {
                 </p>
               </div>
 
-              <button
+              <Button
+                size="lg"
                 onClick={handleGenerateFlashcards}
                 disabled={generating}
-                className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 bg-slate-900 dark:bg-slate-50 text-white dark:text-slate-900 rounded-2xl font-bold transition-all hover:opacity-90 active:scale-95 shadow-xl disabled:opacity-50"
+                className="w-full sm:w-auto"
               >
                 {generating ? <Spinner /> : <><Plus size={20} /> Generate New Sets</>}
-              </button>
+              </Button>
             </div>
 
             {/* List */}
@@ -324,22 +318,20 @@ const FlashcardManager = ({ documentId }) => {
             </p>
 
             <div className="flex justify-end gap-4 pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
-              <button
-                type="button"
+              <Button
+                variant="secondary"
                 onClick={() => setIsDeleteModalOpen(false)}
-                className="px-6 py-2.5 font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-[#232734] rounded-xl transition-all"
               >
                 Retain Pack
-              </button>
+              </Button>
 
-              <button
-                type="button"
+              <Button
+                variant="danger"
                 onClick={handleConfirmDelete}
                 disabled={deleting}
-                className="px-6 py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl transition-all shadow-lg active:scale-95"
               >
                 {deleting ? "Purging..." : "Confirm Purge"}
-              </button>
+              </Button>
             </div>
           </div>
         </Modal>

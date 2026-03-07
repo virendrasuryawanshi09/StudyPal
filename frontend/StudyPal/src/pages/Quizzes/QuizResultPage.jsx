@@ -4,6 +4,7 @@ import { Award, Brain, ArrowLeft, RefreshCw, CheckCircle, XCircle } from "lucide
 import toast from "react-hot-toast";
 import quizService from "../../services/quizService";
 import Spinner from "../../components/common/spinner";
+import Button from "../../components/common/Button";
 
 const QuizResultPage = () => {
   const { quizId } = useParams();
@@ -80,15 +81,15 @@ const QuizResultPage = () => {
                 : "Don't give up. Review the material and try again."}
             </p>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-              <button className="px-5 py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold rounded-xl hover:opacity-90 transition-opacity text-sm">
+              <Button>
                 Share Result
-              </button>
-              <Link
-                to={`/documents/${results.document?._id}`}
-                className="px-5 py-2.5 bg-slate-100 dark:bg-[#232734] text-slate-700 dark:text-slate-300 font-semibold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-sm"
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => navigate(`/documents/${results.document?._id}`)}
               >
                 Review Document
-              </Link>
+              </Button>
             </div>
           </div>
         </div>

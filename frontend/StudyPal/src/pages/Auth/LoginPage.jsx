@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import authService from '../../services/authService';
+import Button from '../../components/common/Button';
 import { BrainCircuit, Mail, Lock, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -15,53 +16,52 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-  try {
-    // ================== DEBUG START (REMOVE LATER) ==================
-    const response = await authService.login(email, password);
-    console.log("LOGIN RESPONSE =>", response);
-    // ================== DEBUG END ==================
+    try {
+      // ================== DEBUG START (REMOVE LATER) ==================
+      const response = await authService.login(email, password);
+      // ================== DEBUG END ==================
 
-    /**
-     * IMPORTANT:
-     * Adjust this based on backend response structure
-     * Common structures handled below
-     */
+      /**
+       * IMPORTANT:
+       * Adjust this based on backend response structure
+       * Common structures handled below
+       */
 
-    const token =
-      response.token ||               // { token, user }
-      response.accessToken ||         // { accessToken, user }
-      response?.data?.token;           // { data: { token, user } }
+      const token =
+        response.token ||               // { token, user }
+        response.accessToken ||         // { accessToken, user }
+        response?.data?.token;           // { data: { token, user } }
 
-    const user =
-      response.user ||
-      response?.data?.user;
+      const user =
+        response.user ||
+        response?.data?.user;
 
-    // ================== SAFETY CHECK ==================
-    if (!token || !user) {
-      throw new Error("Invalid login response. Token or user missing.");
+      // ================== SAFETY CHECK ==================
+      if (!token || !user) {
+        throw new Error("Invalid login response. Token or user missing.");
+      }
+      // ==================================================
+
+      // Store auth data
+      login(user, token);
+
+      toast.success('Logged in successfully');
+      navigate('/dashboard');
+
+    } catch (error) {
+      const message =
+        error?.message || 'Failed to login. Please check your credentials.';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
-    // ==================================================
-
-    // Store auth data
-    login(user, token);
-
-    toast.success('Logged in successfully');
-    navigate('/dashboard');
-
-  } catch (error) {
-    const message =
-      error?.message || 'Failed to login. Please check your credentials.';
-    setError(message);
-    toast.error(message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4
@@ -99,11 +99,10 @@ const LoginPage = () => {
 
             <div className="relative">
               <div
-                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${
-                  focusedField === 'email'
-                    ? 'text-slate-700 dark:text-indigo-400'
-                    : 'text-slate-400 dark:text-slate-500'
-                }`}
+                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${focusedField === 'email'
+                  ? 'text-slate-700 dark:text-indigo-400'
+                  : 'text-slate-400 dark:text-slate-500'
+                  }`}
               >
                 <Mail size={18} />
               </div>
@@ -136,11 +135,10 @@ const LoginPage = () => {
 
             <div className="relative">
               <div
-                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${
-                  focusedField === 'password'
-                    ? 'text-slate-700 dark:text-indigo-400'
-                    : 'text-slate-400 dark:text-slate-500'
-                }`}
+                className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${focusedField === 'password'
+                  ? 'text-slate-700 dark:text-indigo-400'
+                  : 'text-slate-400 dark:text-slate-500'
+                  }`}
               >
                 <Lock size={18} />
               </div>
@@ -170,19 +168,11 @@ const LoginPage = () => {
           )}
 
           {/* Button */}
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 rounded-lg font-semibold text-white
-              bg-gradient-to-r from-slate-700 to-slate-600
-              hover:from-slate-600 hover:to-slate-700
-              dark:bg-gradient-to-r dark:from-indigo-600 dark:to-indigo-500
-              dark:hover:from-indigo-500 dark:hover:to-indigo-600
-              transition-all duration-200 ease-out
-              shadow-md hover:shadow-lg
-              hover:-translate-y-[1px] active:translate-y-0
-              flex items-center justify-center gap-2
-              disabled:opacity-60 disabled:cursor-not-allowed"
+            size="lg"
+            className="w-full"
           >
             {loading ? (
               'Signing in…'
@@ -192,7 +182,7 @@ const LoginPage = () => {
                 <ArrowRight size={18} className="relative top-[1px]" />
               </>
             )}
-          </button>
+          </Button>
         </form>
 
         {/* Footer */}
