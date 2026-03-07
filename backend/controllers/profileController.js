@@ -23,8 +23,8 @@ export const getProfileAnalytics = async (req, res, next) => {
             totalFlashcardsCreated += deck.cards.length;
         });
 
-        // Heuristic: Documents ~ 1.5 hrs, Quizzes ~ 20m, Flashcard Decks ~ 10m
-        const totalStudyTimeHours = Math.round((totalDocuments * 1.5) + (totalQuizzes * 0.33) + (flashcards.length * 0.16));
+        // Realistic calculation based on activity weights
+        const totalStudyTimeHours = Math.round((totalDocuments * 0.5) + (totalQuizzes * 0.25) + (flashcards.length * 0.1));
 
         // 3. Knowledge Mastery (Average score per subject)
         const knowledgeMastery = [];

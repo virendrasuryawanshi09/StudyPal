@@ -50,7 +50,7 @@ export const getDashboard = async (req, res, next) => {
         // --- NEW CALCULATIONS FOR PREMIUM MERN DASHBOARD ---
 
         // 1. Progress Overview Extras
-        const totalStudyTimeHours = Math.round((completedQuizzes * 0.5) + (totalDocuments * 1.2)); // Simulated formula
+        const totalStudyTimeHours = Math.round((totalDocuments * 0.5) + (completedQuizzes * 0.25) + (totalFlashcardsSets * 0.1)); // Conservative activity-based formula
         const topicsCompleted = new Set(quizzes.map(q => q.documentId?.toString())).size;
 
         // 2. Today's Focus (Actionable Next Steps)

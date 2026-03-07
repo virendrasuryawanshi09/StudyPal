@@ -127,14 +127,14 @@ const QuizTakePage = () => {
       </div>
 
       {/* Question Card */}
-      <div className="bg-white dark:bg-[#181b22] border border-slate-200/60 dark:border-slate-800 rounded-[2rem] p-8 md:p-12 relative shadow-sm">
+      <div className="bg-white dark:bg-[#181b22] border border-slate-200/60 dark:border-slate-800 rounded-[2rem] p-5 sm:p-8 md:p-12 relative shadow-sm">
 
         <div className="relative z-10 flex flex-col items-center">
           <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#232734] text-slate-900 dark:text-slate-100 font-bold text-xl mb-6">
             {currentQuestionIndex + 1}
           </span>
 
-          <h3 className="text-2xl font-semibold text-center text-slate-900 dark:text-slate-100 mb-10 leading-relaxed md:px-8">
+          <h3 className="text-xl md:text-2xl font-bold text-center text-slate-900 dark:text-slate-100 mb-10 leading-relaxed md:px-8 font-['Inter']">
             {question.question}
           </h3>
 

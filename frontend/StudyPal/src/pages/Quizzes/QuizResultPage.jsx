@@ -59,7 +59,7 @@ const QuizResultPage = () => {
       </div>
 
       {/* Hero Score Card */}
-      <div className={`relative overflow-hidden rounded-[2rem] p-8 md:p-12 border shadow-sm ${isPass ? "bg-white dark:bg-[#181b22] border-emerald-500/30" : "bg-white dark:bg-[#181b22] border-rose-500/30"
+      <div className={`relative overflow-hidden rounded-[2rem] p-5 sm:p-8 md:p-12 border shadow-sm ${isPass ? "bg-white dark:bg-[#181b22] border-emerald-500/30" : "bg-white dark:bg-[#181b22] border-rose-500/30"
         }`}>
 
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-10 md:gap-16">
@@ -72,7 +72,7 @@ const QuizResultPage = () => {
           </div>
 
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-3xl font-bold mb-3 text-slate-900 dark:text-slate-100">
+            <h1 className="text-2xl md:text-3xl font-bold mb-3 text-slate-900 dark:text-white font-['Inter']">
               {isPass ? "Great Job!" : "Keep Practicing!"}
             </h1>
             <p className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed mb-6 max-w-sm">
@@ -102,7 +102,7 @@ const QuizResultPage = () => {
             <RefreshCw size={20} />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Question Review</h3>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white font-['Inter']">Question Review</h3>
           </div>
         </div>
 

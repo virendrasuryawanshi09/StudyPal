@@ -231,8 +231,8 @@ const ProfilePage = () => {
                   <Shield size={20} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Plan</p>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Premium Scholar</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Account Type</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">StudyPal Beta</p>
                 </div>
               </div>
 
