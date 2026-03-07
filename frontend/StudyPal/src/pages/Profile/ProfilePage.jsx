@@ -16,9 +16,11 @@ import {
 import moment from 'moment';
 import toast from 'react-hot-toast';
 import authService from '../../services/authService';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
   const { user, updateUser } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState(null);
 
@@ -91,10 +93,10 @@ const ProfilePage = () => {
 
   const getScaleColor = (count) => {
     if (!count || count === 0) return 'color-empty';
-    if (count === 1) return 'color-scale-1'; // #818cf8 (Indigo 400)
-    if (count <= 3) return 'color-scale-2';  // #6366f1 (Indigo 500)
-    if (count <= 5) return 'color-scale-3';  // #4f46e5 (Indigo 600)
-    return 'color-scale-4';                  // #4338ca (Indigo 700)
+    if (count === 1) return 'color-scale-1'; // #C7D2FE
+    if (count <= 3) return 'color-scale-2';  // #818CF8
+    if (count <= 5) return 'color-scale-3';  // #4F46E5
+    return 'color-scale-4';                  // #4338CA
   };
 
   const CustomTooltip = ({ active, payload, label }) => {
@@ -137,13 +139,13 @@ const ProfilePage = () => {
           .dark, html.dark {
             --chart-primary: #4f46e5;
           }
-          .react-calendar-heatmap .color-empty { fill: rgba(148, 163, 184, 0.1); }
+          .react-calendar-heatmap .color-empty { fill: #E5E7EB; }
           .dark .react-calendar-heatmap .color-empty { fill: rgba(148, 163, 184, 0.1); }
           
-          .react-calendar-heatmap .color-scale-1 { fill: #94a3b8; }
-          .react-calendar-heatmap .color-scale-2 { fill: #64748b; }
-          .react-calendar-heatmap .color-scale-3 { fill: #475569; }
-          .react-calendar-heatmap .color-scale-4 { fill: #1e293b; }
+          .react-calendar-heatmap .color-scale-1 { fill: #C7D2FE; }
+          .react-calendar-heatmap .color-scale-2 { fill: #818CF8; }
+          .react-calendar-heatmap .color-scale-3 { fill: #4F46E5; }
+          .react-calendar-heatmap .color-scale-4 { fill: #3730A3; }
           
           .dark .react-calendar-heatmap .color-scale-1 { fill: #a5b4fc; }
           .dark .react-calendar-heatmap .color-scale-2 { fill: #818cf8; }
@@ -244,7 +246,7 @@ const ProfilePage = () => {
                 </div>
               </div>
             </div>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" onClick={() => navigate('/settings')}>
               <Settings size={16} /> Manage Settings
             </Button>
           </div>
@@ -252,24 +254,36 @@ const ProfilePage = () => {
           {/* LEETCODE HEATMAP (Col 8) */}
           <div className={`lg:col-span-8 flex flex-col justify-between overflow-x-auto ${CARD_STYLE}`}>
             <CardHeader icon={Activity} title="Study Streak Heatmap" subtitle="Your learning consistency over the past year" />
-            <div className="w-full min-w-[700px] mt-4">
-              <CalendarHeatmap
-                startDate={moment().subtract(365, 'days').toDate()}
-                endDate={new Date()}
-                values={dailyActivity || []}
-                classForValue={(value) => getScaleColor(value?.count)}
-                tooltipDataAttrs={(value) => {
-                  const dateRaw = value?.date ? moment(value.date).format('MMM Do, YYYY') : 'No Data';
-                  const countRaw = value?.count ? `${value.count} activity events` : 'No events';
-                  return {
-                    'data-tooltip-id': 'heatmap-tooltip',
-                    'data-tooltip-content': `${countRaw} on ${dateRaw}`,
-                  };
-                }}
-                showWeekdayLabels={true}
-                gutterSize={3}
-              />
-              <Tooltip id="heatmap-tooltip" className="!bg-slate-900 !text-white !rounded-lg !text-sm !font-medium" />
+            <div
+              className="w-full mt-4 overflow-x-auto overflow-y-hidden pb-4 hide-scrollbar heatmap-container"
+              ref={(node) => {
+                if (node && !node.dataset.scrolled) {
+                  node.scrollLeft = node.scrollWidth;
+                  node.dataset.scrolled = "true";
+                }
+              }}
+            >
+              <div className="min-w-[700px] sm:min-w-full pl-1">
+                <CalendarHeatmap
+                  startDate={moment().subtract(365, 'days').toDate()}
+                  endDate={new Date()}
+                  values={dailyActivity || []}
+                  classForValue={(value) => getScaleColor(value?.count)}
+                  tooltipDataAttrs={(value) => {
+                    const dateRaw = value?.date ? moment(value.date).format('MMM Do, YYYY') : 'Unknown Date';
+                    const tooltipText = value?.count
+                      ? `${value.count} activity events on ${dateRaw}`
+                      : 'No study activity recorded for this day.';
+                    return {
+                      'data-tooltip-id': 'heatmap-tooltip',
+                      'data-tooltip-content': tooltipText,
+                    };
+                  }}
+                  showWeekdayLabels={window.innerWidth > 768}
+                  gutterSize={3}
+                />
+              </div>
+              <Tooltip id="heatmap-tooltip" className="!bg-slate-900 !text-white !rounded-lg !text-sm !font-medium !z-50" />
             </div>
             {(!dailyActivity || dailyActivity.length === 0) && (
               <div className="text-center mt-4">

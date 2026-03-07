@@ -2,15 +2,28 @@ import React, { useState, useEffect } from "react";
 import { Star, RotateCw } from "lucide-react";
 
 const Flashcard = ({ card, onToggleStar }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
 
-  // Reset flip state when card changes
+  // Reset revealed state when card changes
   useEffect(() => {
-    setIsFlipped(false);
+    setIsRevealed(false);
   }, [card._id, card.question]);
 
-  const handleFlip = () => {
-    setIsFlipped(!isFlipped);
+  // Keyboard listener for Spacebar to reveal answer locally
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (!isRevealed) setIsRevealed(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isRevealed]);
+
+  const handleReveal = () => {
+    setIsRevealed(true);
   };
 
   const handleStarClick = (e) => {
@@ -19,70 +32,55 @@ const Flashcard = ({ card, onToggleStar }) => {
   };
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto h-[450px] sm:h-[500px] cursor-pointer group perspective-1000" onClick={handleFlip}>
-      {/* 3D Flip Container */}
-      <div
-        className="w-full h-full relative preserve-3d transition-transform duration-700 ease-out"
-        style={{ transform: isFlipped ? 'rotateX(-180deg)' : 'rotateX(0deg)' }}
-      >
+    <div className="w-full max-w-[720px] mx-auto">
+      {/* Label and Actions */}
+      <div className="flex justify-between items-center mb-6 px-2">
+        <span className="text-sm font-medium text-slate-500 uppercase tracking-wider">
+          Flashcard Topic
+        </span>
+        <button
+          onClick={handleStarClick}
+          className="text-slate-400 hover:text-amber-500 transition-colors p-2 -mr-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+        >
+          <Star size={20} className={card.starred ? "text-amber-500 fill-amber-500" : ""} />
+        </button>
+      </div>
 
-        {/* FRONT FACE (QUESTION) */}
-        <div className="absolute inset-0 w-full h-full bg-white dark:bg-[#181b22] border border-slate-100 dark:border-slate-800 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all flex flex-col p-10 backface-hidden">
+      {/* Main Card */}
+      <div className="bg-white dark:bg-[#181b22] border border-slate-200 dark:border-slate-800 rounded-[16px] shadow-[0_10px_30px_rgba(0,0,0,0.05)] p-10 min-h-[360px] flex flex-col items-center justify-center text-center transition-all duration-300">
 
-          <div className="flex justify-between items-start w-full">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-wide">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              QUESTION
-            </div>
-
-            <button
-              type="button"
-              onClick={handleStarClick}
-              className="p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 text-slate-400 hover:text-amber-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
-            >
-              <Star size={20} className={card.starred ? "text-amber-500 fill-amber-500" : ""} />
-            </button>
-          </div>
-
-          <div className="flex-1 flex items-center justify-center text-center px-4 md:px-12">
-            <h3 className="text-3xl md:text-5xl font-bold text-slate-800 dark:text-slate-100 leading-tight">
-              {card.question}
-            </h3>
-          </div>
-
-          <div className="flex items-center justify-center text-slate-400 text-sm font-medium gap-2 pb-2">
-            <RotateCw size={14} className="group-hover:rotate-180 transition-transform duration-700" />
-            <span>Click to reveal answer</span>
-          </div>
+        {/* Question Area */}
+        <div className="w-full flex-shrink-0 animate-in fade-in duration-500">
+          <p className="text-[12px] font-bold text-indigo-500 tracking-widest uppercase mb-4">Question</p>
+          <h3 className="text-[22px] font-semibold text-slate-900 dark:text-slate-100 font-['Inter'] leading-snug">
+            {card.question}
+          </h3>
         </div>
 
-        {/* BACK FACE (ANSWER) */}
-        <div className="absolute inset-0 w-full h-full bg-slate-50 dark:bg-[#1f232b] border border-slate-100 dark:border-slate-800 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none flex flex-col p-10 backface-hidden"
-          style={{ transform: 'rotateX(180deg)' }}>
-
-          <div className="flex justify-between items-start w-full">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold tracking-wide">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-              ANSWER
-            </div>
-
+        {/* Divider / Action Area */}
+        <div className="w-full mt-10 mb-8 flex flex-col items-center justify-center">
+          {!isRevealed ? (
             <button
-              type="button"
-              onClick={handleStarClick}
-              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-amber-500 bg-white dark:bg-[#232734] transition-all"
+              onClick={handleReveal}
+              className="px-6 py-2.5 bg-[#F8FAFC] dark:bg-[#232734] border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-full hover:bg-slate-100 dark:hover:bg-[#2a2f3a] hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-2 group shadow-sm text-sm"
             >
-              <Star size={20} className={card.starred ? "text-amber-500 fill-amber-500" : ""} />
+              <RotateCw size={16} className="text-slate-400 group-hover:rotate-180 transition-transform duration-500" />
+              Reveal Answer
             </button>
-          </div>
+          ) : (
+            <div className="w-12 h-1 bg-slate-200 dark:bg-slate-700 rounded-full animate-in fade-in duration-300"></div>
+          )}
+        </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center text-center px-4 md:px-12 overflow-y-auto">
-            <div className="w-16 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mb-8 shrink-0"></div>
-            <p className="text-xl md:text-2xl font-medium text-slate-600 dark:text-slate-300 leading-relaxed italic">
+        {/* Answer Area */}
+        {isRevealed && (
+          <div className="w-full animate-in fade-in slide-in-from-top-4 duration-500 flex-1 flex flex-col items-center">
+            <p className="text-[12px] font-bold text-emerald-500 tracking-widest uppercase mb-4">Answer</p>
+            <p className="text-[18px] text-slate-700 dark:text-slate-300 font-['Inter'] leading-[1.6]">
               {card.answer}
             </p>
           </div>
-        </div>
-
+        )}
       </div>
     </div>
   );

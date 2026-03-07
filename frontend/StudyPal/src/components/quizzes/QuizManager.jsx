@@ -442,75 +442,152 @@ const QuizManager = ({ documentId }) => {
                                 <Spinner />
                             </div>
                         ) : quizzes.length === 0 ? (
-                            <div className="text-center py-24 bg-slate-50 dark:bg-[#181b22] border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center">
-                                <div className="w-16 h-16 bg-white dark:bg-[#232734] border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center text-slate-400 mb-6">
+                            <div className="text-center py-24 bg-white dark:bg-[#181b22] border border-dashed border-slate-300 dark:border-slate-800 rounded-3xl flex flex-col items-center justify-center max-w-2xl mx-auto shadow-sm">
+                                <div className="w-16 h-16 bg-slate-50 dark:bg-[#232734] rounded-2xl flex items-center justify-center text-slate-400 mb-6">
                                     <Brain size={28} />
                                 </div>
-                                <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">No Quizzes Yet</h4>
-                                <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6 text-sm">Generate an AI-powered quiz from your document to start testing your knowledge.</p>
+                                <h4 className="text-[22px] font-semibold text-slate-900 dark:text-slate-100 mb-3 font-['Inter']">No quizzes yet</h4>
+                                <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-sm mx-auto text-[15px] leading-relaxed">
+                                    Generate an AI-powered quiz from your notes to start testing your knowledge.
+                                </p>
                                 <Button
-                                    variant="outline"
                                     onClick={handleOpenGenerateModal}
                                 >
-                                    Generate First Quiz
+                                    Generate Quiz
                                 </Button>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {quizzes.map((quiz, index) => (
-                                    <div
-                                        key={quiz._id}
-                                        onClick={() => handleSelectQuiz(quiz)}
-                                        className="bg-white dark:bg-[#181b22] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600 cursor-pointer flex flex-col h-full"
-                                    >
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className={`p-2 rounded-lg ${quiz.completedAt ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
-                                                    {quiz.completedAt ? <CheckCircle size={18} /> : <Clock size={18} />}
-                                                </div>
-                                                <div>
-                                                    <span className={`text-xs font-semibold uppercase tracking-wider ${quiz.completedAt ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
-                                                        {quiz.completedAt ? 'Completed' : 'Pending'}
-                                                    </span>
-                                                </div>
-                                            </div>
+                            <div className="space-y-12">
+                                {/* Analytics Summary Section */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    {(() => {
+                                        const completedQuizzes = quizzes.filter(q => q.completedAt);
+                                        const totalTaken = completedQuizzes.length;
 
-                                            {/* DELETE BUTTON */}
-                                            <button
-                                                type="button"
-                                                onClick={(e) => handleDeleteRequest(e, quiz)}
-                                                className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors"
+                                        const avgScore = totalTaken > 0
+                                            ? Math.round(completedQuizzes.reduce((sum, q) => sum + (q.score || 0), 0) / totalTaken)
+                                            : 0;
+
+                                        const bestScore = totalTaken > 0
+                                            ? Math.max(...completedQuizzes.map(q => q.score || 0))
+                                            : 0;
+
+                                        return (
+                                            <>
+                                                <div className="bg-white dark:bg-[#181b22] rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col">
+                                                    <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Average Score</span>
+                                                    <span className="text-4xl font-bold text-slate-900 dark:text-slate-100 font-['Inter']">{totalTaken > 0 ? `${avgScore}%` : '--'}</span>
+                                                </div>
+                                                <div className="bg-white dark:bg-[#181b22] rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col">
+                                                    <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Best Score</span>
+                                                    <span className="text-4xl font-bold text-slate-900 dark:text-slate-100 font-['Inter']">{totalTaken > 0 ? `${bestScore}%` : '--'}</span>
+                                                </div>
+                                                <div className="bg-white dark:bg-[#181b22] rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col">
+                                                    <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Quizzes Taken</span>
+                                                    <span className="text-4xl font-bold text-slate-900 dark:text-slate-100 font-['Inter']">{totalTaken}</span>
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
+                                </div>
+
+                                {/* Quiz Cards Grid */}
+                                <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-[24px]">
+                                    {quizzes.map((quiz, index) => {
+                                        const scoreColorClass = !quiz.completedAt ? "bg-slate-200"
+                                            : quiz.score >= 90 ? "bg-emerald-500"
+                                                : quiz.score >= 60 ? "bg-indigo-500"
+                                                    : "bg-red-500";
+
+                                        const textColorClass = !quiz.completedAt ? "text-slate-500"
+                                            : quiz.score >= 90 ? "text-emerald-500"
+                                                : quiz.score >= 60 ? "text-indigo-500"
+                                                    : "text-red-500";
+
+                                        return (
+                                            <div
+                                                key={quiz._id}
+                                                className="bg-white dark:bg-[#181b22] border border-slate-200 dark:border-slate-800 rounded-[16px] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-transform duration-300 flex flex-col h-full"
                                             >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
+                                                {/* Header Row */}
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <div className="mb-2">
+                                                        <h4 className="text-[18px] font-semibold text-slate-900 dark:text-slate-100 leading-snug font-['Inter']">
+                                                            {quiz.title || `Quiz #${quizzes.length - index}`}
+                                                        </h4>
+                                                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">
+                                                            {moment(quiz.createdAt).format("MMM D, YYYY")}
+                                                        </p>
+                                                    </div>
 
-                                        <div className="mb-6 flex-grow">
-                                            <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100 leading-snug">
-                                                {quiz.title || `Quiz #${quizzes.length - index}`}
-                                            </h4>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                                                {moment(quiz.createdAt).format("MMM D, YYYY")}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800">
-                                            <div className="flex flex-col">
-                                                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Questions</span>
-                                                <span className="font-semibold text-slate-900 dark:text-slate-100">{quiz.totalQuestions}</span>
-                                            </div>
-
-                                            {quiz.completedAt && (
-                                                <div className="flex flex-col items-end">
-                                                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Score</span>
-                                                    <span className={`font-bold ${quiz.score >= 80 ? 'text-emerald-500' : quiz.score >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>
-                                                        {quiz.score}%
-                                                    </span>
+                                                    {/* Trash Action */}
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => handleDeleteRequest(e, quiz)}
+                                                        className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors -mr-2"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
                                                 </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
+
+                                                <div className="mt-auto pt-6">
+                                                    {/* Stats Row */}
+                                                    <div className="flex justify-between items-end mb-4 font-['Inter']">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[12px] font-medium text-slate-500 uppercase tracking-wider mb-1">Questions</span>
+                                                            <span className="font-semibold text-slate-900 dark:text-slate-100">{quiz.totalQuestions}</span>
+                                                        </div>
+
+                                                        <div className="flex flex-col items-end">
+                                                            <span className="text-[12px] font-medium text-slate-500 uppercase tracking-wider mb-1">Score</span>
+                                                            <span className={`font-bold ${textColorClass}`}>
+                                                                {quiz.completedAt ? `${quiz.score}%` : 'Pending'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Score Visualization Bar */}
+                                                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-6">
+                                                        <div
+                                                            className={`h-full rounded-full transition-all duration-1000 ${scoreColorClass}`}
+                                                            style={{ width: quiz.completedAt ? `${quiz.score}%` : '0%' }}
+                                                        ></div>
+                                                    </div>
+
+                                                    {/* Actions Row */}
+                                                    <div className="flex gap-3">
+                                                        {quiz.completedAt ? (
+                                                            <>
+                                                                <button
+                                                                    onClick={() => handleSelectQuiz(quiz)}
+                                                                    className="flex-1 py-2.5 text-sm font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+                                                                >
+                                                                    View Results
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        // Duplicate/Retry logic could go here, for now it restarts it
+                                                                        handleSelectQuiz(quiz);
+                                                                    }}
+                                                                    className="flex-1 py-2.5 text-sm font-medium rounded-full border border-slate-200 text-slate-600 hover:border-slate-300 transition-colors"
+                                                                >
+                                                                    Retry
+                                                                </button>
+                                                            </>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => handleSelectQuiz(quiz)}
+                                                                className="w-full py-2.5 text-sm font-medium rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 transition-colors"
+                                                            >
+                                                                Start Quiz
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         )}
                     </>

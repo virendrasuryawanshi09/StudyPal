@@ -26,6 +26,23 @@ const FlashcardManager = ({ documentId }) => {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [studyMode, setStudyMode] = useState("study"); // "study" | "preview"
+
+  // Keyboard Navigation for Next/Prev
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!selectedSet || studyMode !== "study") return;
+
+      if (e.key === 'ArrowRight') {
+        handleNext();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrev();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedSet, studyMode, currentCardIndex]);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [setToDelete, setSetToDelete] = useState(null);
@@ -144,43 +161,84 @@ const FlashcardManager = ({ documentId }) => {
   const renderFlashcardViewer = () => {
     const card = selectedSet.cards[currentCardIndex];
     return (
-      <div className="space-y-10 animate-in fade-in zoom-in-95 duration-500">
-        {/* Header */}
-        <div className="flex justify-between items-center bg-slate-100/50 dark:bg-[#181b22] p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+      <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in zoom-in-95 duration-500 pb-20">
+
+        {/* Top Header & Navigation */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 w-full">
           <button
             onClick={() => setSelectedSet(null)}
-            className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors font-semibold"
+            className="flex flex-shrink-0 items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px] md:text-sm border border-slate-200 bg-white px-3 py-1.5 md:py-2 rounded-lg shadow-sm"
           >
-            <ArrowLeft size={18} />
-            Exit Practice
+            <ArrowLeft size={16} />
+            Back
           </button>
 
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-black text-slate-400 uppercase tracking-widest bg-white dark:bg-[#232734] px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">
-              Card {currentCardIndex + 1} / {selectedSet.cards.length}
-            </span>
+          {/* Mode Toggle */}
+          <div className="flex w-full md:w-auto items-center bg-slate-100 p-1 rounded-lg">
+            <button
+              onClick={() => setStudyMode("study")}
+              className={`flex-1 md:flex-none px-4 py-1.5 text-[13px] md:text-sm font-medium rounded-md transition-all ${studyMode === "study" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+            >
+              Study Mode
+            </button>
+            <button
+              onClick={() => setStudyMode("preview")}
+              className={`flex-1 md:flex-none px-4 py-1.5 text-[13px] md:text-sm font-medium rounded-md transition-all ${studyMode === "preview" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+            >
+              Preview Mode
+            </button>
           </div>
         </div>
 
-        {/* Flashcard Component */}
-        <Flashcard card={card} onToggleStar={handleToggleStar} />
+        {studyMode === "study" ? (
+          <>
+            {/* Flashcard Component */}
+            <div className="mt-8">
+              <Flashcard card={card} onToggleStar={handleToggleStar} />
+            </div>
 
-        {/* Navigation */}
-        <div className="flex justify-center items-center gap-10">
-          <button
-            onClick={handlePrev}
-            className="w-14 h-14 rounded-2xl bg-white dark:bg-[#181b22] border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:border-slate-400 dark:hover:border-slate-600 transition-all shadow-lg active:scale-90"
-          >
-            <ChevronLeft size={28} />
-          </button>
+            {/* Bottom Navigation & Progress */}
+            <div className="flex flex-col items-center mt-12 gap-6">
+              <div className="flex items-center gap-4 w-full sm:w-auto justify-center">
+                <button
+                  onClick={handlePrev}
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all font-medium text-sm shadow-sm"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition-all font-medium text-sm shadow-sm"
+                >
+                  Next
+                </button>
+              </div>
 
-          <button
-            onClick={handleNext}
-            className="w-20 h-20 rounded-3xl bg-slate-900 dark:bg-slate-50 flex items-center justify-center text-white dark:text-slate-900 hover:scale-105 transition-all shadow-xl active:scale-95 group"
-          >
-            <ChevronRight size={38} className="group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
+              <div className="text-sm font-medium text-slate-400">
+                Card {currentCardIndex + 1} of {selectedSet.cards.length}
+              </div>
+            </div>
+          </>
+        ) : (
+          /* Preview Mode Component */
+          <div className="mt-8 space-y-4">
+            <h4 className="text-lg font-semibold text-slate-900 mb-6">Previewing {selectedSet.cards.length} Cards</h4>
+            <div className="grid grid-cols-1 gap-4">
+              {selectedSet.cards.map((previewCard, idx) => (
+                <div key={previewCard._id} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col md:flex-row gap-6">
+                  <div className="flex-1 space-y-2">
+                    <span className="text-xs font-bold text-indigo-500 uppercase tracking-wider">Question</span>
+                    <p className="text-slate-900 font-medium">{previewCard.question}</p>
+                  </div>
+                  <div className="flex-1 space-y-2 md:border-l md:border-slate-100 md:pl-6 pt-4 md:pt-0 border-t border-slate-100">
+                    <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider">Answer</span>
+                    <p className="text-slate-600">{previewCard.answer}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
