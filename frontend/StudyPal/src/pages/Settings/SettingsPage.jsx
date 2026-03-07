@@ -6,7 +6,7 @@ import Button from '../../components/common/Button';
 import toast from 'react-hot-toast';
 import authService from '../../services/authService';
 
-const CARD_STYLE = "bg-white dark:bg-[#181b22] border border-slate-200 dark:border-slate-800 rounded-[16px] shadow-[0_10px_30px_rgba(0,0,0,0.05)] p-6 md:p-8 transition-all hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)]";
+const CARD_STYLE = "premium-card bg-white dark:bg-[#181b22] border border-slate-200 dark:border-slate-800 rounded-[16px] shadow-[0_10px_30px_rgba(0,0,0,0.05)] p-6 md:p-8 transition-all";
 
 const SettingsPage = () => {
     const navigate = useNavigate();
@@ -73,7 +73,7 @@ const SettingsPage = () => {
     );
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] p-4 md:p-8 font-sans">
+        <div className="min-h-screen bg-transparent font-sans">
             <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
 
                 {/* Header */}

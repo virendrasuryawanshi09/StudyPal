@@ -77,8 +77,8 @@ const RegisterPage = () => {
             <div className="relative">
               <div
                 className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${focusedField === 'username'
-                    ? 'text-slate-700 dark:text-indigo-400'
-                    : 'text-slate-400 dark:text-slate-500'
+                  ? 'text-slate-700 dark:text-indigo-400'
+                  : 'text-slate-400 dark:text-slate-500'
                   }`}
               >
                 <User size={18} />
@@ -115,8 +115,8 @@ const RegisterPage = () => {
             <div className="relative">
               <div
                 className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${focusedField === 'email'
-                    ? 'text-slate-700 dark:text-indigo-400'
-                    : 'text-slate-400 dark:text-slate-500'
+                  ? 'text-slate-700 dark:text-indigo-400'
+                  : 'text-slate-400 dark:text-slate-500'
                   }`}
               >
                 <Mail size={18} />
@@ -153,8 +153,8 @@ const RegisterPage = () => {
             <div className="relative">
               <div
                 className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none translate-y-[1px] transition-colors ${focusedField === 'password'
-                    ? 'text-slate-700 dark:text-indigo-400'
-                    : 'text-slate-400 dark:text-slate-500'
+                  ? 'text-slate-700 dark:text-indigo-400'
+                  : 'text-slate-400 dark:text-slate-500'
                   }`}
               >
                 <Lock size={18} />

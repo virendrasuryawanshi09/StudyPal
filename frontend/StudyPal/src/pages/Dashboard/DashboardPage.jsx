@@ -123,7 +123,7 @@ const DashboardPage = () => {
   const { overview, analytics } = dashboardData || {};
 
   // --- Premium Styling Constants ---
-  const CARD_STYLE = "bg-white dark:bg-[#0a0a0c] border border-slate-200 dark:border-white/10 rounded-[16px] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.03)] dark:shadow-none hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] dark:hover:border-white/20 transition-all duration-300 hover:-translate-y-1";
+  const CARD_STYLE = "premium-card bg-white dark:bg-[#0a0a0c] border border-slate-200 dark:border-white/10 rounded-[16px] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-300";
 
   // --- Mapped Data ---
   const stats = [
@@ -161,7 +161,7 @@ const DashboardPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-[#050505] text-slate-800 dark:text-slate-200 p-4 md:p-6 lg:p-8 font-sans overflow-x-hidden">
+    <div className="min-h-screen text-slate-800 dark:text-slate-200 font-sans overflow-x-hidden">
       <style>
         {`
           :root {
@@ -183,14 +183,16 @@ const DashboardPage = () => {
             <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Welcome back. Manage your study materials and track your progress.</p>
           </div>
 
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 w-full lg:w-auto hide-scrollbar self-stretch">
-            <DashboardPomodoro />
-            <Button onClick={() => navigate('/documents')} className="h-10 text-sm">
-              <Upload size={16} /> Upload Notes
-            </Button>
-            <Button onClick={() => navigate('/documents')} className="h-10 text-sm">
-              <BrainCircuit size={16} /> Create Quiz
-            </Button>
+          <div className="flex items-center gap-3 w-full lg:w-auto overflow-x-auto pb-2 sm:pb-0 hide-scrollbar scroll-smooth">
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <DashboardPomodoro />
+              <Button onClick={() => navigate('/documents')} className="h-10 text-xs sm:text-sm px-3 sm:px-4 shrink-0 shadow-sm">
+                <Upload size={16} className="sm:mr-1" /> <span className="hidden xs:inline">Upload Notes</span><span className="xs:hidden">Upload</span>
+              </Button>
+              <Button onClick={() => navigate('/documents')} className="h-10 text-xs sm:text-sm px-3 sm:px-4 shrink-0 shadow-sm">
+                <BrainCircuit size={16} className="sm:mr-1" /> <span className="hidden xs:inline">Create Quiz</span><span className="xs:hidden">Quiz</span>
+              </Button>
+            </div>
           </div>
         </div>
 

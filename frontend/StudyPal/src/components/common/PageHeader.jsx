@@ -1,6 +1,6 @@
 import React from 'react'
 
-const PageHeader = ({title, subtitle, children}) => {
+const PageHeader = ({ title, subtitle, children }) => {
   return (
     <div className="flex items-center justify-between nb-6">
       <div>

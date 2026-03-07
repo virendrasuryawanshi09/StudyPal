@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import Footer from './Footer';
 
 const AppLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -30,15 +31,20 @@ const AppLayout = ({ children }) => {
         {/* Header */}
         <Header toggleSidebar={toggleSidebar} />
 
-        {/* Page Content */}
+        {/* Page Content & Footer */}
         <main
           className="
             flex-1
             overflow-x-hidden overflow-y-auto
-            p-4 md:p-6 lg:p-8
+            animate-in fade-in slide-in-from-bottom-2 duration-300
           "
         >
-          {children}
+          <div className="flex flex-col min-h-full">
+            <div className="flex-1 p-4 md:p-6 lg:p-8">
+              {children}
+            </div>
+            <Footer />
+          </div>
         </main>
       </div>
     </div>

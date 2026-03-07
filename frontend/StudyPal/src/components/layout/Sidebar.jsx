@@ -106,11 +106,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                   px-4 py-2.5 rounded-lg
                   text-sm font-semibold
                   transition-all duration-200
-                  ${
-                    isActive
-                      ? 'bg-slate-800 text-white dark:bg-indigo-600'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-[#232734] hover:text-slate-900 dark:hover:text-white'
-                  }
+                  ${isActive
+                  ? 'bg-slate-800 text-white dark:bg-indigo-600'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-[#232734] hover:text-slate-900 dark:hover:text-white'
+                }
                 `
               }
             >

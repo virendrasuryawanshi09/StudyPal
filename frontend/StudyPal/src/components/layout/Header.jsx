@@ -15,7 +15,7 @@ const Header = ({ toggleSidebar }) => {
         transition-colors duration-300
       "
     >
-      <div className="flex items-center justify-between h-full px-6">
+      <div className="flex items-center justify-between h-full px-4 sm:px-6">
 
         {/* Left */}
         <div className="flex items-center gap-3">

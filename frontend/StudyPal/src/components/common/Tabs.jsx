@@ -23,10 +23,9 @@ const Tabs = ({ tabs, activeTab, setActiveTab }) => {
                 sm:px-5 sm:py-3
                 rounded-t-lg
                 transition-all duration-200
-                ${
-                  activeTab === tab.key
-                    ? 'text-slate-900 dark:text-slate-100'
-                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                ${activeTab === tab.key
+                  ? 'text-slate-900 dark:text-slate-100'
+                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }
                 hover:bg-slate-100/70 dark:hover:bg-slate-800/40
               `}

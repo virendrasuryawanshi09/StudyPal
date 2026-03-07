@@ -112,7 +112,7 @@ const ProfilePage = () => {
   };
 
   // --- Premium Styling Constants (Matching Dashboard) ---
-  const CARD_STYLE = "bg-white dark:bg-[#0a0a0c] border border-slate-200 dark:border-white/10 rounded-[16px] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.03)] dark:shadow-none hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] dark:hover:border-white/20 transition-all duration-300 hover:-translate-y-1";
+  const CARD_STYLE = "premium-card bg-white dark:bg-[#0a0a0c] border border-slate-200 dark:border-white/10 rounded-[16px] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-300";
 
   const CardHeader = ({ icon: Icon, title, subtitle, action }) => (
     <div className="flex items-start justify-between mb-6">
@@ -130,7 +130,7 @@ const ProfilePage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-[#050505] text-slate-800 dark:text-slate-200 p-4 md:p-6 lg:p-8 font-sans overflow-x-hidden">
+    <div className="min-h-screen text-slate-800 dark:text-slate-200 font-sans overflow-x-hidden">
       <style>
         {`
           :root {

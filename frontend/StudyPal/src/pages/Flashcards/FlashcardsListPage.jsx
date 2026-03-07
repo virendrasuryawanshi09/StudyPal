@@ -80,12 +80,10 @@ const FlashcardsListPage = () => {
                 to={`/documents/${set.documentId?._id}`}
                 state={{ view: 'flashcards' }}
                 className="
-                  group cursor-pointer
+                  premium-card group cursor-pointer
                   rounded-2xl p-5
                   bg-white dark:bg-[#181b22]
                   border border-slate-200/60 dark:border-slate-700/60
-                  hover:shadow-xl hover:-translate-y-0.5
-                  transition-all duration-200
                   flex flex-col h-full
                 "
               >

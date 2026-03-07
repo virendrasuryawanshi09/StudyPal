@@ -59,7 +59,7 @@ const QuizResultPage = () => {
       </div>
 
       {/* Hero Score Card */}
-      <div className={`relative overflow-hidden rounded-[2rem] p-5 sm:p-8 md:p-12 border shadow-sm ${isPass ? "bg-white dark:bg-[#181b22] border-emerald-500/30" : "bg-white dark:bg-[#181b22] border-rose-500/30"
+      <div className={`relative overflow-hidden rounded-[2rem] p-4 sm:p-8 md:p-12 border shadow-sm ${isPass ? "bg-white dark:bg-[#181b22] border-emerald-500/30" : "bg-white dark:bg-[#181b22] border-rose-500/30"
         }`}>
 
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-10 md:gap-16">

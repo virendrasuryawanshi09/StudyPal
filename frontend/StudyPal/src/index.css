@@ -3,6 +3,7 @@
 
 @theme {
     --font-display: "Inter", sans-serif;
+    --breakpoint-xs: 400px;
     --breakpoint-3xl: 1920px;
     --color-primary: #FF9324;
 }
@@ -11,11 +12,105 @@
     html {
         font-family: var(--font-display);
         background-color: #0f1115;
+        scroll-behavior: smooth;
     }
 
     body {
         background-color: #0f1115 !important;
         color: #f1f5f9 !important;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Custom Premium Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+    }
+
+    /* Global Micro-interactions */
+    button,
+    .btn-interaction {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    button:active:not(:disabled) {
+        transform: scale(0.96);
+    }
+
+    .premium-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .premium-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Page Transitions */
+    .animate-in {
+        animation-duration: 300ms;
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+        animation-fill-mode: forwards;
+    }
+
+    .fade-in {
+        animation-name: fadeIn;
+    }
+
+    .slide-in-from-bottom-2 {
+        animation-name: slideInFromBottom;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideInFromBottom {
+        from {
+            transform: translateY(8px);
+        }
+
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    /* Premium Brand Polish */
+    .brand-gradient {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    }
+
+    .brand-text-gradient {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .dark .premium-glow {
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
     }
 
     /* Global Overrides for Light-Mode Hardcoded Styles */

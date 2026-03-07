@@ -95,7 +95,7 @@ const QuizTakePage = () => {
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 pb-12">
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-slate-900 rounded-2xl p-6 md:p-8 text-slate-100 shadow-sm border border-slate-800">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-slate-900 rounded-2xl p-4 sm:p-6 md:p-8 text-slate-100 shadow-sm border border-slate-800">
 
         <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
           <div className="flex items-center gap-4 hidden md:flex">
@@ -127,7 +127,7 @@ const QuizTakePage = () => {
       </div>
 
       {/* Question Card */}
-      <div className="bg-white dark:bg-[#181b22] border border-slate-200/60 dark:border-slate-800 rounded-[2rem] p-5 sm:p-8 md:p-12 relative shadow-sm">
+      <div className="premium-card bg-white dark:bg-[#181b22] border border-slate-200/60 dark:border-slate-800 rounded-[2rem] p-5 sm:p-8 md:p-12 relative shadow-sm">
 
         <div className="relative z-10 flex flex-col items-center">
           <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#232734] text-slate-900 dark:text-slate-100 font-bold text-xl mb-6">

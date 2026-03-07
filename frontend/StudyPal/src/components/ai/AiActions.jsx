@@ -58,7 +58,7 @@ const AiActions = () => {
           rounded-2xl shadow-sm px-6 py-4">
 
           <div className="flex items-center justify-between gap-6">
-            
+
             {/* LEFT CONTENT */}
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-500/20

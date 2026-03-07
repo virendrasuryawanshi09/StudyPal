@@ -132,17 +132,17 @@ const DocumentListPage = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
             My Documents
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
             Manage and organize your learning materials
           </p>
         </div>
 
-        <Button onClick={() => setIsUploadModalOpen(true)}>
+        <Button onClick={() => setIsUploadModalOpen(true)} className="w-full sm:w-auto h-11">
           <Plus size={18} />
           Upload Document
         </Button>
@@ -207,11 +207,10 @@ const DocumentListPage = () => {
               onDragEnter={() => setIsDragging(true)}
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-xl p-6 transition-colors ${
-                isDragging
+              className={`border-2 border-dashed rounded-xl p-6 transition-colors ${isDragging
                   ? 'border-slate-500 bg-slate-100 dark:bg-[#232734]'
                   : 'border-slate-300 hover:border-slate-400'
-              }`}
+                }`}
             >
               {!uploadFile ? (
                 <div className="text-center cursor-pointer">
