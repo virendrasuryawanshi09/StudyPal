@@ -1,8 +1,8 @@
 import Document from '../models/Document.js';
 import Flashcard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
-import { extractTextFromPDF } from '../utils/pdfParser.js';
-import { chunkText } from '../utils/textChunker.js';
+import { extractTextFromPDF } from '../services/pdfParser.js';
+import { chunkText } from '../services/textChunker.js';
 import fs from 'fs/promises';
 import fsSync from 'fs';
 import path from 'path';

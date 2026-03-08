@@ -38,7 +38,7 @@ const QuizResultPage = () => {
     );
   }
 
-  const scorePercentage = Math.round((results.score / 100) * results.totalQuestions);
+  const correctAnswerCount = Math.round((results.score / 100) * results.totalQuestions);
   const isPass = results.score >= 60;
 
   return (
@@ -67,7 +67,7 @@ const QuizResultPage = () => {
             {/* Score Circle */}
             <div className={`w-40 h-40 md:w-48 md:h-48 rounded-full flex flex-col items-center justify-center relative z-10 border-8 ${isPass ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-rose-500/20 bg-rose-500/5'}`}>
               <span className={`text-5xl md:text-6xl font-bold ${isPass ? 'text-emerald-500' : 'text-rose-500'}`}>{results.score}%</span>
-              <span className="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wide text-xs mt-2">{scorePercentage} / {results.totalQuestions} Right</span>
+              <span className="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wide text-xs mt-2">{correctAnswerCount} / {results.totalQuestions} Right</span>
             </div>
           </div>
 

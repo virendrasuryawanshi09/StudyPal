@@ -285,7 +285,27 @@ const QuizManager = ({ documentId }) => {
     };
 
     const renderActiveQuiz = () => {
+        if (!selectedQuiz || !selectedQuiz.questions || selectedQuiz.questions.length === 0) {
+            return (
+                <div className="flex flex-col items-center justify-center p-12 text-center">
+                    <Brain className="w-12 h-12 text-slate-400 mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">Quiz Content Unavailable</h3>
+                    <p className="text-slate-500 mb-6 text-sm">This quiz doesn't have any questions yet. Try generating a new one.</p>
+                    <Button onClick={() => setSelectedQuiz(null)}>Back to Quizzes</Button>
+                </div>
+            );
+        }
+
         const question = selectedQuiz.questions[currentQuestionIndex];
+
+        if (!question) {
+            return (
+                <div className="flex items-center justify-center p-12">
+                    <Spinner />
+                </div>
+            );
+        }
+
         const isLastQuestion = currentQuestionIndex === selectedQuiz.questions.length - 1;
         const answeredCount = Object.keys(answers).length;
         const allAnswered = answeredCount === selectedQuiz.questions.length;

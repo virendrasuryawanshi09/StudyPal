@@ -2,14 +2,20 @@ import Document from '../models/Document.js';
 import Flashcard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
 import ChatHistory from '../models/ChatHistory.js';
-import * as geminiService from '../utils/geminiService.js';
-import { findRelevantChunks } from '../utils/textChunker.js';
+import * as geminiService from '../services/geminiService.js';
+import { findRelevantChunks } from '../services/textChunker.js';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const logError = (type, error) => {
     const logMsg = `[${new Date().toISOString()}] ${type}: ${error.stack || error}\n`;
+    const logPath = path.join(__dirname, '..', 'backend_errors.log');
     try {
-        fs.appendFileSync('c:\\StudyPal\\backend\\backend_errors.log', logMsg);
+        fs.appendFileSync(logPath, logMsg);
     } catch (e) {
         console.error('Failed to write to log file', e);
     }
