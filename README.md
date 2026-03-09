@@ -1,4 +1,4 @@
-# StudyPal — Personalized AI Learning Assistant 🎓✨
+# StudyPal — Personalized AI Learning Assistant
 
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
@@ -9,44 +9,44 @@
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-### 🧠 AI-Driven Intelligence
+### AI-Driven Intelligence
 - **Automated Knowledge Synthesis:** Leverages Gemini AI to parse complex PDFs/text and generate high-yield Quizzes and Flashcards.
 - **Contextual Feedback Loops:** AI doesn't just grade; it provides meaningful explanations for every incorrect answer, fostering a true learning environment.
 - **Dynamic Content Generation:** Real-time generation of study materials using optimized prompt engineering.
 
-### 💎 Engineering & UI/UX Excellence
+### Engineering & UI/UX Excellence
 - **SaaS Design System:** A meticulously crafted UI using a custom Tailwind configuration, featuring 16px border-radii, glassmorphism, and fluid animations.
 - **Global Interaction Hooks:** Custom CSS keyframes and Framer-inspired transitions ensure every page change feels professional and polished.
 - **Universal Responsiveness:** Engineered for a "perfect" mobile experience (320px+) with zero horizontal overflow and intelligent content wrapping.
 
-### ⏱️ Productivity Suite
+### Productivity Suite
 - **Embedded Focus Engine:** Integrated Pomodoro timer in the dashboard with persistence and live updates.
 - **Consistency Visualization:** GitHub-inspired activity heatmaps and real-time progress analytics (Circular Progress, Bar Charts).
 
 ---
 
-## 🏗️ Technical Highlights & Architecture
+## Technical Highlights & Architecture
 
-### 🛡️ Secure & Scalable Backend
+### Secure & Scalable Backend
 - **RESTful API Design:** Cleanly partitioned controllers, services, and models for high maintainability.
 - **JWT-Based Authentication:** Stateless session management with secure token-based verification.
 - **Mongoose Middleware:** Complex data validation and pre-save hooks for data integrity.
 
-### ⚛️ Advanced Frontend Patterns
+### Advanced Frontend Patterns
 - **Standardized Component Library:** Reusable, accessible UI primitives (Buttons, Modals, Spinners) built from the ground up.
 - **Context API State Management:** Centralized Auth and Global App settings for predictable state transitions.
 - **Premium Layout System:** A robust `AppLayout` wrapper managing global page transitions (`fade-in`, `slide-up`) and consistent navigation.
 
-### ⚡ Performance & Optimization
+### Performance & Optimization
 - **Layout Shift Prevention:** Standardized aspect ratios and skeleton loading principles.
 - **Global CSS Utility:** Shared `.premium-card` and `.btn-interaction` classes to reduce CSS bloat.
 - **Asset Optimization:** Minimal SVG assets and system-level font stacks for lightning-fast First Contentful Paint (FCP).
 
 ---
 
-## 🧩 Project Structure
+## Project Structure
 
 ```text
 StudyPal/
@@ -67,7 +67,7 @@ StudyPal/
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technologies |
 | :--- | :--- |
@@ -79,7 +79,7 @@ StudyPal/
 
 ---
 
-## 💡 Engineering Challenges & Solutions
+## Engineering Challenges & Solutions
 
 ### 1. Handling Large-Scale Document Parsing
 **Challenge:** Generating high-quality quizzes from long, unstructured PDF text without hitting token limits or losing context.
@@ -91,7 +91,7 @@ StudyPal/
 
 ---
 
-## ⚙️ Getting Started
+## Getting Started
 
 ### Prerequisites
 - **Node.js** (v18+)
@@ -119,14 +119,14 @@ StudyPal/
 
 ---
 
-## 🗺️ Future Roadmap
+## Future Roadmap
 - [ ] **Spaced Repetition System (SRS):** Anki-style scheduling for flashcard mastery.
 - [ ] **Collaborative Study Rooms:** Real-time WebSocket integration for shared focus sessions.
 - [ ] **Advanced PDF Parsing:** Multi-column layout support and OCR integration.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 I welcome contributions that enhance StudyPal's feature set or technical performance. 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -136,8 +136,7 @@ I welcome contributions that enhance StudyPal's feature set or technical perform
 
 ---
 
-## ✨ Developed by Virendra Suryawanshi
-**Software Engineer | Modern Web Specialist**
+## Developed by Virendra Suryawanshi
 
 - **GitHub:** [@virendrasuryawanshi09](https://github.com/virendrasuryawanshi09)
 - **LinkedIn:** [Virendra Suryawanshi](https://github.com/virendrasuryawanshi09) *(Replace with actual link)*
