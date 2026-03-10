@@ -7,57 +7,8 @@
 
 > **StudyPal** is a high-performance, full-stack learning ecosystem that leverages AI to turn static documents into dynamic, interactive study tools. Built with a focus on **Premium DX (Developer Experience)** and **SaaS Scalability**.
 
----
-
-## ✨ Platform Walkthrough
-
 <div align="center">
-
-### **Authentication**
-<img src="./Screenshots/LoginPage.png" width="90%" alt="Login Page" />
-
-<br/><br/>
-
-### **Dashboard Experience**
-<img src="./Screenshots/DashBoard1.png" width="45%" alt="Dashboard Layout 1" />&nbsp;
-<img src="./Screenshots/DashBoard2.png" width="45%" alt="Dashboard Layout 2" />
-<br/>
-<img src="./Screenshots/DashBoard3.png" width="45%" alt="Dashboard Layout 3" />&nbsp;
-<img src="./Screenshots/DarkSample.png" width="45%" alt="Dashboard Dark Mode" />
-
-<br/><br/>
-
-### **Document Intelligence**
-<img src="./Screenshots/Document.png" width="45%" alt="Document Overivew" />&nbsp;
-<img src="./Screenshots/DocumentDetail.png" width="45%" alt="Document Detail" />
-
-<br/><br/>
-
-### **AI Chat Assistant**
-<img src="./Screenshots/chat.png" width="90%" alt="AI Chat Interface" />
-
-<br/><br/>
-
-### **Flashcards System**
-<img src="./Screenshots/FlashCard1.png" width="45%" alt="Flashcards View 1" />&nbsp;
-<img src="./Screenshots/FlashCard2.png" width="45%" alt="Flashcards View 2" />
-<br/>
-<img src="./Screenshots/FlashCard3.png" width="45%" alt="Flashcards View 3" />
-
-<br/><br/>
-
-### **Quiz Engine**
-<img src="./Screenshots/Quizz.png" width="45%" alt="Quiz Interface" />&nbsp;
-<img src="./Screenshots/Quizze1.png" width="45%" alt="Quiz Progress" />
-
-<br/><br/>
-
-### **User Profile**
-<img src="./Screenshots/Profile1.png" width="45%" alt="User Profile View 1" />&nbsp;
-<img src="./Screenshots/Profile2.png" width="45%" alt="User Profile View 2" />
-<br/>
-<img src="./Screenshots/Profile3.png" width="45%" alt="User Profile View 3" />
-
+  <img src="Screenshots/DashBoard1.png" alt="StudyPal Dashboard" width="100%" />
 </div>
 
 ---
@@ -77,6 +28,38 @@
 ### Productivity Suite
 - **Embedded Focus Engine:** Integrated Pomodoro timer in the dashboard with persistence and live updates.
 - **Consistency Visualization:** GitHub-inspired activity heatmaps and real-time progress analytics (Circular Progress, Bar Charts).
+
+---
+
+## 📸 Platform Showcase
+
+<table align="center">
+  <tr>
+    <td align="center"><b>Intelligent Document Parsing</b><br><img src="Screenshots/Document_Detail.png" alt="Document View" width="300"/></td>
+    <td align="center"><b>Interactive AI Chat</b><br><img src="Screenshots/chat.png" alt="AI Chat" width="300"/></td>
+    <td align="center"><b>AI Capabilities</b><br><img src="Screenshots/AI_Features_2.png" alt="AI Features" width="300"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Smart Flashcards</b><br><img src="Screenshots/FlashCard1.png" alt="Flashcards" width="300"/></td>
+    <td align="center"><b>Flashcard Review</b><br><img src="Screenshots/FlashCard2.png" alt="Flashcards 2" width="300"/></td>
+    <td align="center"><b>Repetition Tracking</b><br><img src="Screenshots/FlashCard3.png" alt="Flashcards 3" width="300"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>AI Generated Quizzes</b><br><img src="Screenshots/Quizze1.png" alt="Quizzes" width="300"/></td>
+    <td align="center"><b>Quiz Results</b><br><img src="Screenshots/Quizz2.png" alt="Quizzes 2" width="300"/></td>
+    <td align="center"><b>Sleek Dark Mode</b><br><img src="Screenshots/DarkSAmple.png" alt="Dark Mode UI" width="300"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Dashboard Focus</b><br><img src="Screenshots/DashBoard2.png" alt="Dashboard 2" width="300"/></td>
+    <td align="center"><b>Dashboard Hub</b><br><img src="Screenshots/DashBoard3.png" alt="Dashboard 3" width="300"/></td>
+    <td align="center"><b>Secure Login</b><br><img src="Screenshots/LoginPage.png" alt="Login Page" width="300"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Detailed Analytics</b><br><img src="Screenshots/Profile1.png" alt="Profile Analytics" width="300"/></td>
+    <td align="center"><b>Profile Settings</b><br><img src="Screenshots/Profile2.png" alt="Profile Settings" width="300"/></td>
+    <td align="center"><b>Learning History</b><br><img src="Screenshots/Profile3.png" alt="Profile History" width="300"/></td>
+  </tr>
+</table>
 
 ---
 
