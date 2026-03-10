@@ -9,6 +9,59 @@
 
 ---
 
+## ✨ Platform Walkthrough
+
+<div align="center">
+
+### **Authentication**
+<img src="./Screenshots/LoginPage.png" width="90%" alt="Login Page" />
+
+<br/><br/>
+
+### **Dashboard Experience**
+<img src="./Screenshots/DashBoard1.png" width="45%" alt="Dashboard Layout 1" />&nbsp;
+<img src="./Screenshots/DashBoard2.png" width="45%" alt="Dashboard Layout 2" />
+<br/>
+<img src="./Screenshots/DashBoard3.png" width="45%" alt="Dashboard Layout 3" />&nbsp;
+<img src="./Screenshots/DarkSample.png" width="45%" alt="Dashboard Dark Mode" />
+
+<br/><br/>
+
+### **Document Intelligence**
+<img src="./Screenshots/Document.png" width="45%" alt="Document Overivew" />&nbsp;
+<img src="./Screenshots/DocumentDetail.png" width="45%" alt="Document Detail" />
+
+<br/><br/>
+
+### **AI Chat Assistant**
+<img src="./Screenshots/chat.png" width="90%" alt="AI Chat Interface" />
+
+<br/><br/>
+
+### **Flashcards System**
+<img src="./Screenshots/FlashCard1.png" width="45%" alt="Flashcards View 1" />&nbsp;
+<img src="./Screenshots/FlashCard2.png" width="45%" alt="Flashcards View 2" />
+<br/>
+<img src="./Screenshots/FlashCard3.png" width="45%" alt="Flashcards View 3" />
+
+<br/><br/>
+
+### **Quiz Engine**
+<img src="./Screenshots/Quizz.png" width="45%" alt="Quiz Interface" />&nbsp;
+<img src="./Screenshots/Quizze1.png" width="45%" alt="Quiz Progress" />
+
+<br/><br/>
+
+### **User Profile**
+<img src="./Screenshots/Profile1.png" width="45%" alt="User Profile View 1" />&nbsp;
+<img src="./Screenshots/Profile2.png" width="45%" alt="User Profile View 2" />
+<br/>
+<img src="./Screenshots/Profile3.png" width="45%" alt="User Profile View 3" />
+
+</div>
+
+---
+
 ## Key Features
 
 ### AI-Driven Intelligence
