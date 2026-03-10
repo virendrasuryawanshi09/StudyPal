@@ -11,15 +11,21 @@
 @layer base {
     html {
         font-family: var(--font-display);
-        background-color: #0f1115;
+        background-color: #f8fafc; /* light bg */
         scroll-behavior: smooth;
     }
 
     body {
-        background-color: #0f1115 !important;
-        color: #f1f5f9 !important;
+        background-color: #f8fafc;
+        color: #0f172a; /* light mode text */
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Dark mode body/html */
+    .dark html, .dark body {
+        background-color: #0f1115 !important;
+        color: #f1f5f9 !important;
     }
 
     /* Custom Premium Scrollbar */
@@ -111,26 +117,5 @@
 
     .dark .premium-glow {
         box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
-    }
-
-    /* Global Overrides for Light-Mode Hardcoded Styles */
-    .bg-white:not(.dark .bg-white) {
-        background-color: #181b22 !important;
-    }
-
-    .bg-slate-50:not(.dark .bg-slate-50) {
-        background-color: #0f1115 !important;
-    }
-
-    .bg-slate-100:not(.dark .bg-slate-100) {
-        background-color: #1f2430 !important;
-    }
-
-    .text-slate-900:not(.dark .text-slate-900) {
-        color: #f1f5f9 !important;
-    }
-
-    .border-slate-200:not(.dark .border-slate-200) {
-        border-color: #334155 !important;
     }
 }
