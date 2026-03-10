@@ -8,7 +8,11 @@
 > **StudyPal** is a high-performance, full-stack learning ecosystem that leverages AI to turn static documents into dynamic, interactive study tools. Built with a focus on **Premium DX (Developer Experience)**.
 
 <div align="center">
-  <img src="Screenshots/DashBoard1.png" alt="StudyPal Dashboard" width="100%" />
+  <img src="Screenshots/DashBoard1.png" alt="StudyPal Dashboard 1" width="100%" />
+  <br>
+  <img src="Screenshots/DashBoard2.png" alt="StudyPal Dashboard 2" width="100%" />
+  <br>
+  <img src="Screenshots/DashBoard3.png" alt="StudyPal Dashboard 3" width="100%" />
 </div>
 
 ---
@@ -50,14 +54,12 @@
     <td align="center"><b>Sleek Dark Mode</b><br><img src="Screenshots/DarkSAmple.png" alt="Dark Mode UI" width="300"/></td>
   </tr>
   <tr>
-    <td align="center"><b>Dashboard Focus</b><br><img src="Screenshots/DashBoard2.png" alt="Dashboard 2" width="300"/></td>
-    <td align="center"><b>Dashboard Hub</b><br><img src="Screenshots/DashBoard3.png" alt="Dashboard 3" width="300"/></td>
-    <td align="center"><b>Secure Login</b><br><img src="Screenshots/LoginPage.png" alt="Login Page" width="300"/></td>
-  </tr>
-  <tr>
     <td align="center"><b>Detailed Analytics</b><br><img src="Screenshots/Profile1.png" alt="Profile Analytics" width="300"/></td>
     <td align="center"><b>Profile Settings</b><br><img src="Screenshots/Profile2.png" alt="Profile Settings" width="300"/></td>
     <td align="center"><b>Learning History</b><br><img src="Screenshots/Profile3.png" alt="Profile History" width="300"/></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="3"><b>Secure Login</b><br><img src="Screenshots/LoginPage.png" alt="Login Page" width="300"/></td>
   </tr>
 </table>
 
