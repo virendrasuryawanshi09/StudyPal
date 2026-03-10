@@ -5,7 +5,7 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-> **StudyPal** is a high-performance, full-stack learning ecosystem that leverages AI to turn static documents into dynamic, interactive study tools. Built with a focus on **Premium DX (Developer Experience)** and **SaaS Scalability**.
+> **StudyPal** is a high-performance, full-stack learning ecosystem that leverages AI to turn static documents into dynamic, interactive study tools. Built with a focus on **Premium DX (Developer Experience)**.
 
 <div align="center">
   <img src="Screenshots/DashBoard1.png" alt="StudyPal Dashboard" width="100%" />
@@ -21,7 +21,7 @@
 - **Dynamic Content Generation:** Real-time generation of study materials using optimized prompt engineering.
 
 ### Engineering & UI/UX Excellence
-- **SaaS Design System:** A meticulously crafted UI using a custom Tailwind configuration, featuring 16px border-radii, glassmorphism, and fluid animations.
+- **Modern Design System:** A meticulously crafted UI using a custom Tailwind configuration, featuring 16px border-radii, glassmorphism, and fluid animations.
 - **Global Interaction Hooks:** Custom CSS keyframes and Framer-inspired transitions ensure every page change feels professional and polished.
 - **Universal Responsiveness:** Engineered for a "perfect" mobile experience (320px+) with zero horizontal overflow and intelligent content wrapping.
 
@@ -87,17 +87,21 @@
 ```text
 StudyPal/
 ├── backend/                # Node/Express API
+│   ├── config/             # Database & environment config
 │   ├── controllers/        # Business logic
+│   ├── middleware/         # Custom Express middleware
 │   ├── models/             # Mongoose schemas
-│   ├── routes/             # Express endpoints
-│   └── services/           # AI Logic & PDF Parsing
-├── frontend/StudyPal/      # React Client
+│   ├── routes/             # API endpoints
+│   ├── services/           # AI Logic & external API wrappers
+│   └── server.js           # Server entry point
+├── frontend/StudyPal/      # React/Vite Client
 │   ├── src/
-│   │   ├── components/     # UI Primitives & Layout
-│   │   ├── context/        # Global State Management
-│   │   ├── pages/          # Feature-based views
-│   │   └── services/       # Frontend API clients
-│   └── public/             # Optimized brand assets (SVG)
+│   │   ├── components/     # Reusable UI Primitives
+│   │   ├── pages/          # Full page views
+│   │   └── ...
+│   ├── public/             # Static assets
+│   └── index.html          # HTML entry point
+├── Screenshots/            # Project documentation images
 └── README.md               # Technical Documentation
 ```
 
@@ -121,7 +125,7 @@ StudyPal/
 **Challenge:** Generating high-quality quizzes from long, unstructured PDF text without hitting token limits or losing context.
 **Solution:** Implemented a sophisticated prompt engineering layer that chunks text into thematic modules before synthesizing them through the Gemini AI service.
 
-### 2. Perfecting the "SaaS Feel" on Mobile
+### 2. Perfecting the Mobile Experience
 **Challenge:** Horizontal scrolling and layout jitter on 320px screens due to fixed-width assets.
 **Solution:** Removed redundant page padding in favor of a global layout-level spacing strategy, combined with dynamic CSS visibility triggers to hide non-essential text on ultra-compact displays.
 
@@ -152,13 +156,6 @@ StudyPal/
    - Head to `/frontend/StudyPal`
    - `npm install`
    - `npm run dev`
-
----
-
-## Future Roadmap
-- [ ] **Spaced Repetition System (SRS):** Anki-style scheduling for flashcard mastery.
-- [ ] **Collaborative Study Rooms:** Real-time WebSocket integration for shared focus sessions.
-- [ ] **Advanced PDF Parsing:** Multi-column layout support and OCR integration.
 
 ---
 
