@@ -5,7 +5,6 @@ import RegisterPage from "./pages/Auth/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DashboardPage from "./pages/Dashboard/DashboardPage.jsx";
-import DocumentListPage from "./pages/documents/DocumentListPage";
 import DocumentDetailPage from "./pages/Documents/DocumentDetailPage";
 import FlashcardListPage from "./pages/Flashcards/FlashcardsListPage";
 import QuizTakePage from "./pages/Quizzes/QuizTakePage";
