@@ -2,7 +2,7 @@ import Document from '../models/Document.js';
 import Flashcard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
 import ChatHistory from '../models/ChatHistory.js';
-import * as geminiService from '../services/geminiService.js';
+import * as geminiService from '../services/aiRouter.js';
 import { findRelevantChunks } from '../services/textChunker.js';
 import fs from 'fs';
 import path from 'path';
