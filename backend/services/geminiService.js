@@ -104,7 +104,7 @@ ${question}
 
   } catch (err) {
     console.error("GEMINI CHAT ERROR:", err);
-    throw new Error("Failed to process chat request");
+    throw err;
   }
 };
 

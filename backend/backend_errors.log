@@ -1,0 +1,5 @@
+[2026-03-10T06:14:19.753Z] CHAT ERROR: Error: Failed to process chat request
+    at Module.chatWithContext (file:///C:/StudyPal/backend/services/geminiService.js:107:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async executeWithFallback (file:///C:/StudyPal/backend/services/aiRouter.js:24:16)
+    at async chat (file:///C:/StudyPal/backend/controllers/aiController.js:274:24)
