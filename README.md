@@ -31,7 +31,7 @@
 
 ---
 
-## 📸 Platform Showcase
+## Platform Showcase
 
 <table align="center">
   <tr>
@@ -172,7 +172,7 @@ I welcome contributions that enhance StudyPal's feature set or technical perform
 ## Developed by Virendra Suryawanshi
 
 - **GitHub:** [@virendrasuryawanshi09](https://github.com/virendrasuryawanshi09)
-- **LinkedIn:** [Virendra Suryawanshi](https://github.com/virendrasuryawanshi09) *(Replace with actual link)*
+- **LinkedIn:** [Virendra Suryawanshi](https://www.linkedin.com/in/virendra-suryawanshi805/) 
 
 *This project is a testament to my commitment to clean code, user-centric design, and the effective integration of AI in modern web applications. If you're looking for a developer who builds with purpose and precision, let's connect.*
 
