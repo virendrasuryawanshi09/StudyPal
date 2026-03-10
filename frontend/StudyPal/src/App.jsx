@@ -6,6 +6,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DashboardPage from "./pages/Dashboard/DashboardPage.jsx";
 import DocumentDetailPage from "./pages/Documents/DocumentDetailPage";
+import DocumentListPage from "./pages/Documents/DocumentListPage";
 import FlashcardListPage from "./pages/Flashcards/FlashcardsListPage";
 import QuizTakePage from "./pages/Quizzes/QuizTakePage";
 import QuizResultPage from "./pages/Quizzes/QuizResultPage";
