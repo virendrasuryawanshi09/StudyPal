@@ -61,8 +61,7 @@ export const uploadDocument = async (req, res, next) => {
       });
     }
 
-    const baseUrl = `http://localhost:${process.env.PORT || 8000}`;
-    const fileUrl = `${baseUrl}/uploads/documents/${req.file.filename}`;
+    const fileUrl = `/uploads/documents/${req.file.filename}`;
 
     const document = await Document.create({
       userId: req.user._id,
@@ -200,10 +199,11 @@ export const deleteDocument = async (req, res, next) => {
     }
 
     const filename = path.basename(document.filePath);
-    const filePath = path.join(__dirname, '../uploads/documents', filename);
+    const uploadDir = path.join(__dirname, '../uploads/documents');
+    const localFilePath = path.join(uploadDir, filename);
 
-    if (filePath && !document.filePath.startsWith('http')) {
-      await fs.unlink(filePath).catch(err => console.error("Failed to delete local file:", err.message));
+    if (localFilePath && !document.filePath.startsWith('http')) {
+      await fs.unlink(localFilePath).catch(err => console.error("Failed to delete local file:", err.message));
     }
 
     await document.deleteOne();

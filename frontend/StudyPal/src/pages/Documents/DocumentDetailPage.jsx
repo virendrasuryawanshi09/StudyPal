@@ -10,6 +10,9 @@ import Chatinterface from '../../components/chat/Chatinterface';
 import AiActions from '../../components/ai/AiActions';
 import FlashcardManager from '../../components/flashcards/FlashcardManager';
 import QuizManager from '../../components/quizzes/QuizManager';
+import PdfViewer from '../../components/common/PdfViewer';
+import { BASE_URL } from '../../utils/apiPaths';
+
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -46,15 +49,22 @@ const DocumentDetailPage = () => {
     const filePath = document?.data?.filePath;
     if (!filePath) return null;
 
-    // Absolute URL
+    // Relative URL (new format)
+    if (filePath.startsWith('/')) {
+      return `${BASE_URL}${filePath}`;
+    }
+
+    // Absolute URL (legacy or external)
     if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+      // If it's a legacy localhost URL, replace it with current BASE_URL origin
+      if (filePath.includes('localhost:8000')) {
+        return filePath.replace(/http:\/\/localhost:8000/g, BASE_URL);
+      }
       return filePath;
     }
 
-    // Relative URL
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-
-    return `${baseUrl}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
+    // Fallback for other formats
+    return `${BASE_URL}/${filePath}`;
   };
 
   /* ================= TAB RENDERS ================= */
@@ -108,12 +118,7 @@ const DocumentDetailPage = () => {
             bg-white dark:bg-[#181b22]
           "
         >
-          <iframe
-            src={pdfUrl}
-            title="PDF Viewer"
-            className="w-full h-full"
-            frameBorder="0"
-          />
+          <PdfViewer url={pdfUrl} />
         </div>
       </div>
     );
