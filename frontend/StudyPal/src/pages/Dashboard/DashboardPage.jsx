@@ -140,9 +140,9 @@ const DashboardPage = () => {
     : [];
 
   // Circular Progress Data
-  const dailyProg = Math.min(100, Math.max(10, (overview?.pointsLevel || 1) * 15));
-  const weeklyProg = Math.min(100, Math.max(20, (overview?.completedQuizzes || 0) * 10));
-  const monthlyProg = Math.min(100, overview?.averageScore || 50);
+  const dailyProg = overview?.points === 0 ? 0 : Math.min(100, (overview?.pointsLevel || 1) * 15);
+  const weeklyProg = Math.min(100, (overview?.completedQuizzes || 0) * 10);
+  const monthlyProg = Math.min(100, overview?.averageScore || 0);
 
   // Components
   const CardHeader = ({ icon: Icon, title, subtitle, action }) => (
