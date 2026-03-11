@@ -383,7 +383,6 @@ const QuizManager = ({ documentId }) => {
                 {/* Navigation & Actions */}
                 <div className="flex justify-between items-center max-w-2xl mx-auto px-4">
                     <Button
-                        variant="outline"
                         onClick={handlePrevQuestion}
                         disabled={currentQuestionIndex === 0}
                     >

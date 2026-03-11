@@ -200,18 +200,18 @@ const FlashcardManager = ({ documentId }) => {
             {/* Bottom Navigation & Progress */}
             <div className="flex flex-col items-center mt-12 gap-6">
               <div className="flex items-center gap-4 w-full sm:w-auto justify-center">
-                <button
+                <Button
                   onClick={handlePrev}
-                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all font-medium text-sm shadow-sm"
+                  className="flex-1 sm:flex-none px-8"
                 >
                   Previous
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleNext}
-                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition-all font-medium text-sm shadow-sm"
+                  className="flex-1 sm:flex-none px-8"
                 >
                   Next
-                </button>
+                </Button>
               </div>
 
               <div className="text-sm font-medium text-slate-400">

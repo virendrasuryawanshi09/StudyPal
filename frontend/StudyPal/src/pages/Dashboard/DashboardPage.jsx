@@ -165,10 +165,11 @@ const DashboardPage = () => {
       <style>
         {`
           :root {
-            --chart-primary: #1e293b;
+            --chart-primary: #1e293b; 
           }
           .dark, html.dark {
-            --chart-primary: #4f46e5;
+            /* Sleek, professional violet-indigo designed for dark mode contrast */
+            --chart-primary: #8b5cf6; /* Tailwind violet-500 */
           }
         `}
       </style>
@@ -324,7 +325,7 @@ const DashboardPage = () => {
                     />
                     <Bar dataKey="activity" radius={[0, 4, 4, 0]}>
                       {(analytics?.weeklyActivity || []).map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.activity > 0 ? 'var(--chart-primary)' : 'rgba(148, 163, 184, 0.2)'} className="hover:opacity-80 cursor-pointer" />
+                        <Cell key={`cell-${index}`} fill={entry.activity > 0 ? 'var(--chart-primary)' : 'rgba(255, 255, 255, 0.06)'} className="hover:opacity-80 cursor-pointer transition-opacity" />
                       ))}
                     </Bar>
                   </BarChart>
