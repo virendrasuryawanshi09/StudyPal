@@ -49,22 +49,30 @@ const DocumentDetailPage = () => {
     const filePath = document?.data?.filePath;
     if (!filePath) return null;
 
-    // Relative URL (new format)
+    // 1. If it's already a relative path, just prepend BASE_URL
     if (filePath.startsWith('/')) {
       return `${BASE_URL}${filePath}`;
     }
 
-    // Absolute URL (legacy or external)
-    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-      // If it's a legacy localhost URL, replace it with current BASE_URL origin
-      if (filePath.includes('localhost:8000')) {
-        return filePath.replace(/http:\/\/localhost:8000/g, BASE_URL);
+    // 2. If it's an absolute URL, check if it points to localhost
+    if (filePath.startsWith('http')) {
+      // If we are in production but the URL points to localhost, swap it for our real BASE_URL
+      if (filePath.includes('localhost')) {
+        // This handles cases like http://localhost:8000/uploads/...
+        // by extracting the path portion and appending it to BASE_URL
+        const pathPart = filePath.split('/uploads/')[1];
+        if (pathPart) {
+          return `${BASE_URL}/uploads/${pathPart}`;
+        }
+        
+        // Generic replacement as backup
+        return filePath.replace(/http:\/\/localhost:\d+/g, BASE_URL);
       }
       return filePath;
     }
 
-    // Fallback for other formats
-    return `${BASE_URL}/${filePath}`;
+    // 3. Fallback for any other weird formats
+    return `${BASE_URL}/${filePath.replace(/^\/+/, '')}`;
   };
 
   /* ================= TAB RENDERS ================= */
