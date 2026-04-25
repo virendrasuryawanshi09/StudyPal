@@ -32,7 +32,7 @@ const RegisterPage = () => {
       navigate('/login');
     } catch (error) {
       const message =
-        error?.message || 'Failed to register. Please try again.';
+        error?.error || error?.message || 'Failed to register. Please try again.';
       setError(message);
       toast.error(message);
     } finally {

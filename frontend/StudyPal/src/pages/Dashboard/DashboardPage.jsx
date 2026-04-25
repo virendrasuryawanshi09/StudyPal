@@ -272,7 +272,7 @@ const DashboardPage = () => {
             <CardHeader icon={Activity} title="Performance Analytics" subtitle="Quiz accuracy trends over recent sessions" />
             <div className="h-[250px] w-full mt-4">
               {chartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.4} />
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} dy={10} />
@@ -313,7 +313,7 @@ const DashboardPage = () => {
             <CardHeader icon={Calendar} title="Weekly Activity" subtitle="Study events across the week" />
             <div className="h-[250px] w-full mt-4 bg-slate-50/50 dark:bg-white/5 rounded-xl p-2 border border-slate-100 dark:border-white/5">
               {analytics?.weeklyActivity?.reduce((sum, item) => sum + item.activity, 0) > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <BarChart data={analytics?.weeklyActivity} layout="vertical" margin={{ top: 0, right: 10, left: -15, bottom: 0 }} barSize={16}>
                     <XAxis type="number" hide />
                     <YAxis dataKey="day" type="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 11, fontWeight: 700 }} />

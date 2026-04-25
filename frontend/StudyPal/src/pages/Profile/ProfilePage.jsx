@@ -299,7 +299,7 @@ const ProfilePage = () => {
           <div className={`lg:col-span-8 flex flex-col ${CARD_STYLE}`}>
             <CardHeader icon={BarChart} title="Weekly Study Activity" subtitle="Your activity volume over the last 7 days" />
             <div className="h-[250px] w-full mt-4">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <BarChart data={weeklyActivity || []} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#94a3b8" strokeOpacity={0.2} />
                   <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} dy={10} />
