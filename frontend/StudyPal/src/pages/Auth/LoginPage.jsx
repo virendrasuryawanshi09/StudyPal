@@ -22,32 +22,24 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // ================== DEBUG START (REMOVE LATER) ==================
-      const response = await authService.login(email, password);
-      // ================== DEBUG END ==================
 
-      /**
-       * IMPORTANT:
-       * Adjust this based on backend response structure
-       * Common structures handled below
-       */
+      const response = await authService.login(email, password);
+
 
       const token =
-        response.token ||               // { token, user }
-        response.accessToken ||         // { accessToken, user }
-        response?.data?.token;           // { data: { token, user } }
+        response.token ||
+        response.accessToken ||
+        response?.data?.token;
 
       const user =
         response.user ||
         response?.data?.user;
 
-      // ================== SAFETY CHECK ==================
+
       if (!token || !user) {
         throw new Error("Invalid login response. Token or user missing.");
       }
-      // ==================================================
 
-      // Store auth data
       login(user, token);
 
       toast.success('Logged in successfully');

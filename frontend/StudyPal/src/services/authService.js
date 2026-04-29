@@ -6,7 +6,7 @@ const login = async (email, password) => {
     const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, { email, password });
     return response.data; // expected to be { token, user }
   } catch (error) {
-    // Handle axios errors properly
+
     if (error.response) {
       // Backend responded with an error status
       throw error.response.data || { message: "Server returned an error" };
