@@ -26,14 +26,7 @@ const LoginPage = () => {
       const response = await authService.login(email, password);
 
 
-      const token =
-        response.token ||
-        response.accessToken ||
-        response?.data?.token;
-
-      const user =
-        response.user ||
-        response?.data?.user;
+      const { user, token } = response.data;
 
 
       if (!token || !user) {
