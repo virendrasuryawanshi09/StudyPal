@@ -18,6 +18,12 @@ axiosInstance.interceptors.request.use(
       accessToken = accessToken.replace(/^"|"$/g, "");
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+    
+    // Allow the browser to set the multipart/form-data boundary automatically
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
+    
     return config;
   },
   (error) => {
