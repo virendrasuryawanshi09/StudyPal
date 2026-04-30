@@ -71,9 +71,9 @@ const QuizManager = ({ documentId }) => {
         try {
             setGenerating(true);
             setIsGenerateModalOpen(false);
-            await aiService.generateQuiz(documentId, generateOptions);
+            const res = await aiService.generateQuiz(documentId, generateOptions);
             toast.success("Quiz generated successfully!");
-            fetchQuizzes();
+            setQuizzes(prev => [res.data, ...prev]);
         } catch (error) {
             const msg = error?.error || error?.message || "Quiz generation failed. Please try again.";
             toast.error(msg);

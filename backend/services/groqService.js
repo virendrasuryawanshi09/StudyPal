@@ -43,7 +43,7 @@ export const chatWithContext = async (question, chunks) => {
             .join("\n\n")
             .slice(0, 8000);
 
-        const system = `You are a helpful study assistant. Answer the user's question ONLY using the context below. If the answer is not present, say "Not found in document".\n\nContext:\n${context}`;
+        const system = `You are a helpful study assistant. Answer the user's question ONLY using the context below. If the answer is not present, say "Not found in document". Format your answer using beautiful markdown with bold text or bullet points where appropriate.\n\nContext:\n${context}`;
 
         return await callGroq(system, question);
     } catch (err) {
@@ -56,7 +56,7 @@ export const chatWithContext = async (question, chunks) => {
 
 export const generateSummary = async (text) => {
     try {
-        const system = "You are a helpful study assistant. Summarize the user's text clearly and concisely.";
+        const system = "You are a helpful study assistant. Provide a comprehensive summary of the text. Include a brief overview paragraph, followed by 3-5 key bullet points highlighting the most important concepts. Use beautiful markdown formatting.";
         return await callGroq(system, `Summarize the following text:\n\n${text.slice(0, 8000)}`);
     } catch (err) {
         console.error("GROQ SUMMARY ERROR:", err);
@@ -126,7 +126,7 @@ Each object in the array must have the exact following structure:
 
 export const explainConcept = async (concept, context) => {
     try {
-        const system = `You are a helpful study assistant. Explain the concept using the context below in simple terms.\n\n${context.slice(0, 8000)}`;
+        const system = `You are a helpful study assistant. Explain the concept using the context below. Break it down into simple terms, use an easy-to-understand analogy, and format the response using beautiful markdown.\n\n${context.slice(0, 8000)}`;
         return await callGroq(system, `Explain the concept "${concept}"`);
     } catch (err) {
         console.error("GROQ EXPLAIN ERROR:", err);
