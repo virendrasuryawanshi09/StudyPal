@@ -18,11 +18,15 @@ const isRateLimitOrCriticalError = (error) => {
 
 const executeWithFallback = async (functionName, ...args) => {
     try {
-        // Groq is blazing fast, so we try it first
+
         return await groqService[functionName](...args);
     } catch (groqError) {
-        console.warn(`[AI ROUTER] Groq failed for ${functionName}:`, groqError.message);
-        console.log(`[AI ROUTER] Falling back to Gemini...`);
+        if (!isRateLimitOrCriticalError(groqError)) {
+            throw groqError;
+        }
+        console.warn(`[AI ROUTER] Falling back to Gemini...`);
+
+
         try {
             return await geminiService[functionName](...args);
         } catch (geminiError) {
@@ -38,7 +42,7 @@ const executeWithFallback = async (functionName, ...args) => {
     }
 };
 
-/* ---------------- EXPORTS ---------------- */
+
 
 export const chatWithContext = (...args) => executeWithFallback('chatWithContext', ...args);
 export const generateSummary = (...args) => executeWithFallback('generateSummary', ...args);
