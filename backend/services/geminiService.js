@@ -130,15 +130,25 @@ export const generateFlashcards = async (text, count = 10) => {
   try {
     const prompt = `
 Create ${count} flashcards from the text below.
-
-Format strictly as:
-Q: [Question]
-A: [Answer]
+Return ONLY a valid JSON array of objects.
+Each object must have the exact following structure:
+{
+  "question": "The question text",
+  "answer": "The answer text"
+}
 
 Text:
 ${text.slice(0, 8000)}
 `;
-    return await callGemini(prompt);
+    const resString = await callGemini(prompt);
+    let cleanedString = resString.trim();
+    if (cleanedString.includes("\`\`\`")) {
+      const match = cleanedString.match(/\`\`\`(?:json)?([\s\S]*?)\`\`\`/);
+      if (match) {
+        cleanedString = match[1].trim();
+      }
+    }
+    return JSON.parse(cleanedString);
   } catch (err) {
     console.error("FLASHCARD ERROR:", err);
     throw err;

@@ -60,23 +60,19 @@ export const generateFlashcards = async (req, res, next) => {
             Number(count)
         );
 
-        if (typeof cards === "string") {
-            const flashcardsArray = [];
-            const blocks = cards.split("\n\n");
-            for (let block of blocks) {
-                const questionMatch = block.match(/Q:\s*(.*)/);
-                const answerMatch = block.match(/A:\s*(.*)/);
-                if (questionMatch && answerMatch) {
-                    flashcardsArray.push({
-                        question: questionMatch[1].trim(),
-                        answer: answerMatch[1].trim(),
-                        difficulty: "medium",
-                        reviewCount: 0,
-                        isStarred: false,
-                    });
+        if (!Array.isArray(cards)) {
+            // If the AI somehow returned an object with a cards array inside
+            if (cards && Array.isArray(cards.flashcards)) cards = cards.flashcards;
+            else if (cards && Array.isArray(cards.cards)) cards = cards.cards;
+            else if (typeof cards === "string") {
+                try {
+                    cards = JSON.parse(cards);
+                } catch (e) {
+                    cards = [];
                 }
+            } else {
+                cards = [];
             }
-            cards = flashcardsArray;
         }
 
         if (!Array.isArray(cards) || cards.length === 0) {

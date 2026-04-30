@@ -67,8 +67,20 @@ export const generateSummary = async (text) => {
 
 export const generateFlashcards = async (text, count = 10) => {
     try {
-        const system = `Create ${count} flashcards from the text below.\nFormat strictly as:\nQ: [Question]\nA: [Answer]`;
-        return await callOpenAI(system, `Text:\n${text.slice(0, 8000)}`);
+        const system = `Create ${count} flashcards from the text below.
+Return ONLY a valid JSON array of objects.
+Each object must have the exact following structure:
+{
+  "question": "The question text",
+  "answer": "The answer text"
+}`;
+        const resString = await callOpenAI(system, `Text:\n${text.slice(0, 8000)}`, true);
+        try {
+            const parsed = JSON.parse(resString);
+            return parsed.flashcards || parsed.cards || parsed;
+        } catch (e) {
+            throw new Error("Failed to parse flashcards JSON");
+        }
     } catch (err) {
         console.error("OPENAI FLASHCARD ERROR:", err);
         throw err;
