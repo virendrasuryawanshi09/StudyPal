@@ -30,6 +30,9 @@ const executeWithFallback = async (functionName, ...args) => {
         try {
             return await geminiService[functionName](...args);
         } catch (geminiError) {
+            if (!isRateLimitOrCriticalError(geminiError)) {
+                throw geminiError;
+            }
             console.warn(`[AI ROUTER] Gemini ALSO failed:`, geminiError.message);
             console.warn(`[AI ROUTER] Falling back to OpenAI...`);
             try {
