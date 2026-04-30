@@ -72,9 +72,9 @@ const FlashcardManager = ({ documentId }) => {
   const handleGenerateFlashcards = async () => {
     try {
       setGenerating(true);
-      await aiService.generateFlashcards(documentId);
+      const res = await aiService.generateFlashcards(documentId);
       toast.success("Flashcards generated!");
-      fetchFlashcardSets();
+      setFlashcardSets(prev => [res.data, ...prev]);
     } catch (error) {
       const msg = error?.error || error?.message || "Generation failed. Please try again.";
       toast.error(msg);

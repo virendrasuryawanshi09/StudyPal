@@ -16,33 +16,25 @@ const isRateLimitOrCriticalError = (error) => {
     return false;
 };
 
-/* ---------------- FALLBACK WRAPPER ---------------- */
-
 const executeWithFallback = async (functionName, ...args) => {
     try {
-        console.log(`[AI ROUTER] Trying Gemini for ${functionName}...`);
-        return await geminiService[functionName](...args);
-    } catch (geminiError) {
-        console.warn(`[AI ROUTER] Gemini failed for ${functionName}:`, geminiError.message);
-
-        if (isRateLimitOrCriticalError(geminiError)) {
-            console.warn(`[AI ROUTER] Rate limit/critical error detected. Falling back to Groq...`);
+        // Groq is blazing fast, so we try it first
+        return await groqService[functionName](...args);
+    } catch (groqError) {
+        console.warn(`[AI ROUTER] Groq failed for ${functionName}:`, groqError.message);
+        console.log(`[AI ROUTER] Falling back to Gemini...`);
+        try {
+            return await geminiService[functionName](...args);
+        } catch (geminiError) {
+            console.warn(`[AI ROUTER] Gemini ALSO failed:`, geminiError.message);
+            console.warn(`[AI ROUTER] Falling back to OpenAI...`);
             try {
-                return await groqService[functionName](...args);
-            } catch (groqError) {
-                console.error(`[AI ROUTER] Groq fallback ALSO failed:`, groqError.message);
-                console.warn(`[AI ROUTER] Falling back to OpenAI...`);
-                try {
-                    return await openAiService[functionName](...args);
-                } catch (openAiError) {
-                    console.error(`[AI ROUTER] OpenAI fallback ALSO failed:`, openAiError.message);
-                    throw openAiError; // Throw the ultimate failure back to the controller
-                }
+                return await openAiService[functionName](...args);
+            } catch (openAiError) {
+                console.error(`[AI ROUTER] OpenAI fallback ALSO failed:`, openAiError.message);
+                throw openAiError; // Throw the ultimate failure
             }
         }
-
-        // If it wasn't a rate limit (e.g., bad request context), throw the original Gemini error
-        throw geminiError;
     }
 };
 
